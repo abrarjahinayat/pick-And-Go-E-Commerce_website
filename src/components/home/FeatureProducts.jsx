@@ -17,7 +17,6 @@ const FeatureProducts = () => {
       .get(`${process.env.NEXT_PUBLIC_API}/products/allproducts`)
       .then((res) => {
         setProducts(res?.data?.data ?? [])
-        console.log("Products:", res?.data?.data)
         setLoading(false)
       })
       .catch((err) => {

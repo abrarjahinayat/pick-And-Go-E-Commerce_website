@@ -81,7 +81,7 @@ const Category = () => {
                 </div>
 
                 {/* Category Name - Outside and Above Image */}
-                <div className="absolute z-999 -top-4 left-1/2 transform -translate-x-1/2 bg-white px-4 py-2 rounded-full shadow-md border border-gray-200">
+                <div className="absolute  -top-4 left-1/2 transform -translate-x-1/2 bg-white px-4 py-2 rounded-full shadow-md border border-gray-200">
                   <h3 className="font-semibold text-gray-900 text-[12px] whitespace-nowrap group-hover:text-blue-600 transition-colors duration-300">
                     {category?.name || 'Category'}
                   </h3>
