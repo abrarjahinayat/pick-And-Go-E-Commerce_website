@@ -199,7 +199,11 @@ const Page = () => {
         paymentmethod: paymentMethod,
       })
       .then((res) => {
-        console.log(res);
+       if(res.data.method === 'cod'){
+        router.push("/order-success");
+       }else{
+        window.location.href = res.data.paymenturl;
+       }
       })
       .catch((err) => {
         console.log(err);

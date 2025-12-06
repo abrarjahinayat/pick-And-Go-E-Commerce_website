@@ -29,7 +29,7 @@ const Page = () => {
     const fetchCart = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:4000/api/v1/cart/singlecart/${userId?._id}`
+          `${process.env.NEXT_PUBLIC_API}/cart/singlecart/${userId?._id}`
         );
 
         const apiItems = res?.data?.data || [];
@@ -398,17 +398,7 @@ const Page = () => {
                   </div>
                 )}
 
-                <div className="flex justify-between text-gray-600">
-                  <span className="flex items-center gap-1">
-                    Shipping
-                    {shipping === 0 && (
-                      <span className="text-xs text-green-600">(Free)</span>
-                    )}
-                  </span>
-                  <span className="font-medium">
-                    {shipping === 0 ? "Free" : `৳${shipping.toFixed(2)}`}
-                  </span>
-                </div>
+              
 
             
               </div>
