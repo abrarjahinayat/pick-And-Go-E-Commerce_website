@@ -74,13 +74,13 @@ const Page = () => {
     };
 
     fetchCart();
-  }, [userId?._id]);
+  }, [userId?._id , cartItems]);
 
   const updateQuantity = (id, newQantity) => {
     console.log(id)
     axios.patch(`${process.env.NEXT_PUBLIC_API}/cart/updatecart/${userId?._id}`, {
       product : id.productId,
-      variant: id.variants,
+      variant: id?.variants,
       quantity: newQantity,
     })
       .then((res) => {
