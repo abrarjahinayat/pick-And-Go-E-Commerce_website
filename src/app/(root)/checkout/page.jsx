@@ -24,8 +24,10 @@ const Page = () => {
   const [processing, setProcessing] = useState(false);
   const [city, setCity] = useState([]);
   const [divisions, setDivisions] = useState([]);
+  const [shippingcharge, setShippingcharge] = useState(0);
 
   const [shippingInfo, setShippingInfo] = useState({
+    user: userId?._id,
     fullName: "",
     email: "",
     phone: "",
@@ -34,10 +36,23 @@ const Page = () => {
     state: "",
     zipCode: "",
     country: "Bangladesh",
+    paymentMethod: "cod", // 👈 NEW: cod | online
   });
 
   const [errors, setErrors] = useState({});
 
+  // Prefill name & email from logged-in user
+  useEffect(() => {
+    if (userId?._id) {
+      setShippingInfo((prev) => ({
+        ...prev,
+        fullName: prev.fullName || userId.name || "",
+        email: prev.email || userId.email || "",
+      }));
+    }
+  }, [userId]);
+
+  // Fetch cart items
   useEffect(() => {
     const fetchCart = async () => {
       try {
@@ -66,10 +81,12 @@ const Page = () => {
         setLoading(false);
       }
     };
+
     if (userId?._id) fetchCart();
     else setLoading(false);
   }, [userId?._id]);
 
+  // Fetch cities
   useEffect(() => {
     axios
       .get("https://bdapis.com/api/v1.2/districts")
@@ -81,6 +98,7 @@ const Page = () => {
       });
   }, []);
 
+  // Fetch divisions
   useEffect(() => {
     axios
       .get("https://bdapis.com/api/v1.2/divisions")
@@ -92,58 +110,113 @@ const Page = () => {
       });
   }, []);
 
-  console.log(userId)
-
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
-  const shipping = subtotal > 50 ? 0 : 5.99;
-  const tax = subtotal * 0.08;
-  const total = subtotal + shipping + tax;
+  const shipping = shippingcharge ?? 0;
+  const total = subtotal + shipping;
 
   const handleShippingChange = (e) => {
     const { name, value } = e.target;
-    setShippingInfo((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+
+    // update form state
+    setShippingInfo((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // clear error for this field
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+
+    // update shipping charge based on city
+    if (name === "city") {
+      if (!value) {
+        setShippingcharge(0);
+      } else if (value === "Dhaka") {
+        setShippingcharge(60);
+      } else {
+        setShippingcharge(120);
+      }
+    }
   };
 
   const validateShipping = () => {
     const newErrors = {};
+
     if (!shippingInfo.fullName.trim())
       newErrors.fullName = "Full name is required";
+
     if (!shippingInfo.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(shippingInfo.email)) {
       newErrors.email = "Email is invalid";
     }
+
     if (!shippingInfo.phone.trim())
       newErrors.phone = "Phone number is required";
+
     if (!shippingInfo.address.trim()) newErrors.address = "Address is required";
+
     if (!shippingInfo.city.trim()) newErrors.city = "City is required";
-    if (!shippingInfo.zipCode.trim())
-      newErrors.zipCode = "ZIP code is required";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleProceedToPayment = async () => {
-    if (!validateShipping()) return;
+    const {
+      user,
+      fullName,
+      email,
+      phone,
+      address,
+      city,
+      state,
+      zipCode,
+      paymentMethod, // 👈 payment method available here
+    } = shippingInfo;
 
-    setProcessing(true);
-    try {
-      // Save shipping info and redirect to payment page
-      // You can store this in Redux or localStorage
-      localStorage.setItem("shippingInfo", JSON.stringify(shippingInfo));
+    // console.log(
+    //   fullName,
+    //   email,
+    //   phone,
+    //   address,
+    //   city,
+    //   state,
+    //   zipCode,
+    //   paymentMethod
+    // );
 
-      // Redirect to payment page
-      router.push("/payment");
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Something went wrong");
-    } finally {
-      setProcessing(false);
-    }
+    await axios
+      .post(`${process.env.NEXT_PUBLIC_API}/order/createorder`, {
+        user: userId?._id,
+        phone,
+        address,
+        city,
+        paymentmethod: paymentMethod,
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    // if (!validateShipping()) return;
+
+    // setProcessing(true);
+    // try {
+    //   localStorage.setItem("shippingInfo", JSON.stringify(shippingInfo));
+    //   router.push("/payment");
+    // } catch (error) {
+    //   console.error("Error:", error);
+    //   alert("Something went wrong");
+    // } finally {
+    //   setProcessing(false);
+    // }
   };
 
   if (loading) {
@@ -223,7 +296,7 @@ const Page = () => {
                       <input
                         type="text"
                         name="fullName"
-                        value={(userId?.name || shippingInfo.fullName).toUpperCase()}
+                        value={shippingInfo.fullName}
                         onChange={handleShippingChange}
                         className={`w-full pl-10 pr-4 py-3 border ${
                           errors.fullName ? "border-red-500" : "border-gray-300"
@@ -247,7 +320,7 @@ const Page = () => {
                       <input
                         type="email"
                         name="email"
-                        value={(userId?.email || shippingInfo.email).toLowerCase()}
+                        value={shippingInfo.email}
                         onChange={handleShippingChange}
                         className={`w-full pl-10 pr-4 py-3 border ${
                           errors.email ? "border-red-500" : "border-gray-300"
@@ -313,13 +386,11 @@ const Page = () => {
 
                 {/* City, State, ZIP */}
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {/* City */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       City <span className="text-red-500">*</span>
                     </label>
-
-                    {/* city */}
-
                     <select
                       name="city"
                       value={shippingInfo.city}
@@ -333,17 +404,16 @@ const Page = () => {
                         </option>
                       ))}
                     </select>
-
                     {errors.city && (
                       <p className="text-red-500 text-xs mt-1">{errors.city}</p>
                     )}
                   </div>
 
+                  {/* State / Division */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       State/Division
                     </label>
-
                     <select
                       name="state"
                       value={shippingInfo.state}
@@ -359,6 +429,7 @@ const Page = () => {
                     </select>
                   </div>
 
+                  {/* ZIP Code */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       ZIP Code
@@ -371,6 +442,35 @@ const Page = () => {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="1000"
                     />
+                  </div>
+                </div>
+
+                {/* Payment Method */}
+                <div className="mt-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">
+                    Payment Method
+                  </h3>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <label className="flex items-center gap-2 border rounded-lg px-4 py-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="cod"
+                        checked={shippingInfo.paymentMethod === "cod"}
+                        onChange={handleShippingChange}
+                      />
+                      <span>Cash on Delivery (COD)</span>
+                    </label>
+                    <label className="flex items-center gap-2 border rounded-lg px-4 py-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="online"
+                        checked={shippingInfo.paymentMethod === "online"}
+                        onChange={handleShippingChange}
+                      />
+                      <span>Online Payment</span>
+                    </label>
                   </div>
                 </div>
 
@@ -437,10 +537,6 @@ const Page = () => {
                   <span className="font-medium">
                     {shipping === 0 ? "Free" : `৳${shipping.toFixed(2)}`}
                   </span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Tax (8%)</span>
-                  <span className="font-medium">৳{tax.toFixed(2)}</span>
                 </div>
               </div>
 

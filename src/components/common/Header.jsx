@@ -1,17 +1,28 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useSelector } from 'react-redux'
 import { ShoppingCart, Search, User, Heart, Menu, LogOut } from 'lucide-react'
+import axios from 'axios'
 
 const Header = () => {
   const [showAccountMenu, setShowAccountMenu] = useState(false)
+  const [cartData, setCartData] = useState([]);
   const user = useSelector((state) => state.user.value)
 
   const handleLogout = () => {
     // Add your logout logic here
     console.log('Logging out...')
   }
+
+  useEffect(()=>{
+    axios.get(`${process.env.NEXT_PUBLIC_API}/cart/singlecart/${user?._id}`).then((res)=>{
+      // Handle the response if needed
+      setCartData(res?.data?.data);
+    }).catch((err)=>{
+      console.error("Error fetching cart data:", err);
+    })
+  }, [user?._id] , cartData)
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -110,7 +121,7 @@ const Header = () => {
             <Link href="/cart" className="relative hover:text-blue-600 transition">
               <ShoppingCart className="w-6 h-6" />
               <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
-                5
+               {cartData?.length || 0}
               </span>
             </Link>
 

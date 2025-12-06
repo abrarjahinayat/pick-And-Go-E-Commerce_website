@@ -187,7 +187,7 @@ const Page = () => {
   const discount = appliedPromo ? (subtotal * appliedPromo.discount) / 100 : 0;
   const shipping = subtotal > 50 ? 0 : 5.99;
   const tax = (subtotal - discount) * 0.08;
-  const total = subtotal - discount + shipping + tax;
+  const total = subtotal - discount + shipping ;
 
   return (
     <section className="py-12 bg-gray-50 min-h-screen">
@@ -410,10 +410,7 @@ const Page = () => {
                   </span>
                 </div>
 
-                <div className="flex justify-between text-gray-600">
-                  <span>Tax (8%)</span>
-                  <span className="font-medium">৳{tax.toFixed(2)}</span>
-                </div>
+            
               </div>
 
               {/* Total */}
