@@ -115,7 +115,7 @@ const Page = () => {
     ) || 0;
 
   const shipping = orderData.city === "Dhaka" ? 60 : 120;
-  const grandTotal = subtotal + shipping;
+  const grandTotal = orderData.totalprice || subtotal + shipping;
 
   return (
     <section className="py-12 bg-gradient-to-b from-green-50 to-gray-50 min-h-screen">

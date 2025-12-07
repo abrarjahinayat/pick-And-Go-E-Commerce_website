@@ -344,45 +344,7 @@ const Page = () => {
                 Order Summary
               </h2>
 
-              {/* Promo Code */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Promo Code
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={promoCode}
-                    onChange={(e) => setPromoCode(e.target.value)}
-                    placeholder="Enter code"
-                    disabled={appliedPromo}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                  />
-                  {appliedPromo ? (
-                    <button
-                      onClick={removePromoCode}
-                      className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
-                    >
-                      Remove
-                    </button>
-                  ) : (
-                    <button
-                      onClick={applyPromoCode}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      Apply
-                    </button>
-                  )}
-                </div>
-                {appliedPromo && (
-                  <div className="mt-2 flex items-center gap-2 text-sm text-green-600">
-                    <Tag className="w-4 h-4" />
-                    <span>
-                      {appliedPromo.code} applied - {appliedPromo.discount}% off
-                    </span>
-                  </div>
-                )}
-              </div>
+        
 
               {/* Price Breakdown */}
               <div className="space-y-3 mb-6 pb-6 border-b border-gray-200">

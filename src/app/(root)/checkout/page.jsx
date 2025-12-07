@@ -25,6 +25,8 @@ const Page = () => {
   const [city, setCity] = useState([]);
   const [divisions, setDivisions] = useState([]);
   const [shippingcharge, setShippingcharge] = useState(0);
+  const [coupon, setcoupon] = useState("");
+  const [applycopun, setapplycopun] = useState(0);
 
   const [shippingInfo, setShippingInfo] = useState({
     user: userId?._id,
@@ -110,12 +112,26 @@ const Page = () => {
       });
   }, []);
 
+  const handlecoupon = () => {
+    axios.post(`${process.env.NEXT_PUBLIC_API}/coupon/applyCoupons`, {
+     code: coupon,
+    }).then((res) => {
+      if(res.data.data.minPrice <= subtotal ){
+        setapplycopun(res.data.data.amout);
+      } else {
+        alert(`Minimum purchase amount for this coupon is ৳${res.data.data.minPrice}`);
+      }
+    }).catch((err) => {
+      alert("Invalid Promo Code");
+    });
+  };
+
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
   const shipping = shippingcharge ?? 0;
-  const total = subtotal + shipping;
+  const total = (subtotal + shipping) - applycopun;
 
   const handleShippingChange = (e) => {
     const { name, value } = e.target;
@@ -197,13 +213,14 @@ const Page = () => {
         address,
         city,
         paymentmethod: paymentMethod,
+        totalprice: total,
       })
       .then((res) => {
-       if(res.data.method === 'cod'){
-        router.push("/order-success");
-       }else{
-        window.location.href = res.data.paymenturl;
-       }
+        if (res.data.method === "cod") {
+          router.push("/order-success");
+        } else {
+          window.location.href = res.data.paymenturl;
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -531,7 +548,7 @@ const Page = () => {
               </div>
 
               {/* Price Breakdown */}
-              <div className="space-y-3 mb-6 pb-6 border-t border-b border-gray-200 pt-4">
+              <div className="space-y-3 mb-4 pb-6 border-t border-b border-gray-200 pt-4">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
                   <span className="font-medium">৳{subtotal.toFixed(2)}</span>
@@ -541,6 +558,27 @@ const Page = () => {
                   <span className="font-medium">
                     {shipping === 0 ? "Free" : `৳${shipping.toFixed(2)}`}
                   </span>
+                </div>
+              </div>
+              {/* Promo Code */}
+              <div className="mb-6 border-b border-gray-200 pb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Promo Code
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    onChange={(e) => setcoupon(e.target.value)}
+                    placeholder="Enter code"
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                  />
+
+                  <button
+                    onClick={handlecoupon}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Apply
+                  </button>
                 </div>
               </div>
 
