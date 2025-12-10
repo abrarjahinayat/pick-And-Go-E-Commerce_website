@@ -2,3 +2,20 @@
 
 @import "slick-carousel/slick/slick.css";
 @import "slick-carousel/slick/slick-theme.css";
+
+
+@keyframes sonnerSlideInRight {
+  from {
+    transform: translate(10%,130%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(0%,130%);
+    opacity: 1;
+  }
+}
+
+.sonner-right-slide {
+  animation: sonnerSlideInRight 0.40s ease-out forwards;
+}
+

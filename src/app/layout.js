@@ -22,7 +22,13 @@ export default function RootLayout({ children }) {
         <ReduxProvider>
           <VerifyUser>
             {children}
-            <Toaster richColors position="top-center" /> {/* 🔥 Required */}
+              <Toaster
+          position="top-right"   // toast shows on top-right
+          richColors             // nice UI colors
+          toastOptions={{
+            className: "sonner-right-slide"  // custom animation class
+          }}
+        />
           </VerifyUser>
         </ReduxProvider>
       </body>

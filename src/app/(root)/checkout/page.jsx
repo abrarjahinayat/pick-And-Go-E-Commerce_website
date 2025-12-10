@@ -14,6 +14,7 @@ import {
   ArrowLeft,
   ShoppingBag,
 } from "lucide-react";
+import { toast } from "sonner"
 
 const Page = () => {
   const router = useRouter();
@@ -119,10 +120,10 @@ const Page = () => {
       if(res.data.data.minPrice <= subtotal ){
         setapplycopun(res.data.data.amout);
       } else {
-        alert(`Minimum purchase amount for this coupon is ৳${res.data.data.minPrice}`);
+        toast.info(`Minimum purchase amount for this coupon is ৳${res.data.data.minPrice}`);
       }
     }).catch((err) => {
-      alert("Invalid Promo Code");
+      toast.error("Invalid Promo Code");
     });
   };
 

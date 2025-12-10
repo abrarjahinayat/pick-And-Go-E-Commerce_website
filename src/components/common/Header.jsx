@@ -1,28 +1,36 @@
-"use client"
-import React, { useEffect, useState } from 'react'
-import Link from 'next/link'
-import { useSelector } from 'react-redux'
-import { ShoppingCart, Search, User, Heart, Menu, LogOut } from 'lucide-react'
-import axios from 'axios'
+"use client";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useSelector } from "react-redux";
+import { ShoppingCart, Search, User, Heart, Menu, LogOut } from "lucide-react";
+import axios from "axios";
 
 const Header = () => {
-  const [showAccountMenu, setShowAccountMenu] = useState(false)
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [cartData, setCartData] = useState([]);
-  const user = useSelector((state) => state.user.value)
+  const user = useSelector((state) => state.user.value);
 
   const handleLogout = () => {
     // Add your logout logic here
-    console.log('Logging out...')
-  }
+    localStorage.removeItem("token");
+    // console.log("Logging out...");
+  };
 
-  useEffect(()=>{
-    axios.get(`${process.env.NEXT_PUBLIC_API}/cart/singlecart/${user?._id}`).then((res)=>{
-      // Handle the response if needed
-      setCartData(res?.data?.data);
-    }).catch((err)=>{
-      console.error("Error fetching cart data:", err);
-    })
-  }, [user?._id] , cartData)
+  useEffect(
+    () => {
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API}/cart/singlecart/${user?._id}`)
+        .then((res) => {
+          // Handle the response if needed
+          setCartData(res?.data?.data);
+        })
+        .catch((err) => {
+          console.error("Error fetching cart data:", err);
+        });
+    },
+    [user?._id , cartData]
+    
+  );
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -30,10 +38,17 @@ const Header = () => {
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center text-sm">
-            <p className="hidden sm:block">Free shipping on orders over $50</p>
+            <p className="hidden sm:block">
+              • Spend ৳1000 & get ৳100 off with
+              Coupon: <strong >AJA50</strong>
+            </p>
             <div className="flex items-center gap-4 ml-auto">
-              <Link href="/track-order" className="hover:underline">Track Order</Link>
-              <Link href="/help" className="hover:underline">Help</Link>
+              <Link href="/track-order" className="hover:underline">
+                Track Order
+              </Link>
+              <Link href="/help" className="hover:underline">
+                Help
+              </Link>
             </div>
           </div>
         </div>
@@ -66,7 +81,7 @@ const Header = () => {
 
           {/* Right Icons */}
           <div className="flex items-center space-x-6">
-            <div 
+            <div
               className="hidden sm:block relative"
               onMouseEnter={() => setShowAccountMenu(true)}
               onMouseLeave={() => setShowAccountMenu(false)}
@@ -74,7 +89,7 @@ const Header = () => {
               <div className="flex items-center space-x-1 hover:text-blue-600 transition cursor-pointer">
                 <User className="w-5 h-5" />
                 <span className="text-sm font-medium">
-                  {user?.name || 'Account'}
+                  {user?.name || "Account"}
                 </span>
               </div>
 
@@ -111,17 +126,23 @@ const Header = () => {
               )}
             </div>
 
-            <Link href="/wishlist" className="hidden sm:block relative hover:text-blue-600 transition">
+            <Link
+              href="/wishlist"
+              className="hidden sm:block relative hover:text-blue-600 transition"
+            >
               <Heart className="w-5 h-5" />
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                 3
               </span>
             </Link>
 
-            <Link href="/cart" className="relative hover:text-blue-600 transition">
+            <Link
+              href="/cart"
+              className="relative hover:text-blue-600 transition"
+            >
               <ShoppingCart className="w-6 h-6" />
               <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold">
-               {cartData?.length || 0}
+                {cartData?.length || 0}
               </span>
             </Link>
 
@@ -136,32 +157,53 @@ const Header = () => {
       <nav className="border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="hidden md:flex items-center justify-center space-x-8 h-12">
-            <Link href="/new-arrivals" className="text-sm font-medium hover:text-blue-600 transition">
+            <Link
+              href="/new-arrivals"
+              className="text-sm font-medium hover:text-blue-600 transition"
+            >
               New Arrivals
-            </Link> 
-            <Link href="/allproducts" className="text-sm font-medium hover:text-blue-600 transition">
-             All Products
             </Link>
-            <Link href="/men" className="text-sm font-medium hover:text-blue-600 transition">
+            <Link
+              href="/allproducts"
+              className="text-sm font-medium hover:text-blue-600 transition"
+            >
+              All Products
+            </Link>
+            <Link
+              href="/men"
+              className="text-sm font-medium hover:text-blue-600 transition"
+            >
               Men
             </Link>
-            <Link href="/women" className="text-sm font-medium hover:text-blue-600 transition">
+            <Link
+              href="/women"
+              className="text-sm font-medium hover:text-blue-600 transition"
+            >
               Women
             </Link>
-            <Link href="/kids" className="text-sm font-medium hover:text-blue-600 transition">
+            <Link
+              href="/kids"
+              className="text-sm font-medium hover:text-blue-600 transition"
+            >
               Kids
             </Link>
-            <Link href="/accessories" className="text-sm font-medium hover:text-blue-600 transition">
+            <Link
+              href="/accessories"
+              className="text-sm font-medium hover:text-blue-600 transition"
+            >
               Accessories
             </Link>
-            <Link href="/sale" className="text-sm font-medium text-red-600 hover:text-red-700 transition">
+            <Link
+              href="/sale"
+              className="text-sm font-medium text-red-600 hover:text-red-700 transition"
+            >
               Sale 🔥
             </Link>
           </div>
         </div>
       </nav>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

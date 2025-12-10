@@ -14,6 +14,10 @@ import {
   Truck,
 } from "lucide-react";
 import { useSelector } from "react-redux";
+import { toast } from "sonner";
+import { io } from "socket.io-client";
+
+let socket = io("http://localhost:4000");
 
 const Page = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -31,6 +35,9 @@ const Page = () => {
         const res = await axios.get(
           `${process.env.NEXT_PUBLIC_API}/cart/singlecart/${userId?._id}`
         );
+        // socket.on("addToCart", (addcart) => {
+        //   console.log("Cart data received:", addcart);
+        // });
 
         const apiItems = res?.data?.data || [];
 
@@ -59,7 +66,7 @@ const Page = () => {
             variants: variants._id || null,
             size: variants.size || null,
             color: variants.color || null,
-            
+
             // backend didn't send stock; set a safe default
             stock: product.stock || 99,
           };
@@ -74,10 +81,10 @@ const Page = () => {
     };
 
     fetchCart();
-  }, [userId?._id , cartItems]);
+  }, [userId?._id, cartItems]);
 
   const updateQuantity = (id, newQantity) => {
-    console.log(id)
+    console.log(id);
     axios.patch(`${process.env.NEXT_PUBLIC_API}/cart/updatecart/${userId?._id}`, {
       product : id.productId,
       variant: id?.variants,
@@ -89,6 +96,13 @@ const Page = () => {
       .catch((err) => {
         console.log(err);
       });
+
+    // socket.emit("update-cart", {
+    //   userId: userId?._id,
+    //   product: id.productId,
+    //   variant: id?.variants,
+    //   quantity: newQantity,
+    // });
 
     // if (newQuantity < 1) return;
 
@@ -118,21 +132,6 @@ const Page = () => {
       .catch((err) => {
         console.log(err);
       });
-  };
-
-  const applyPromoCode = () => {
-    if (promoCode.toUpperCase() === "SAVE10") {
-      setAppliedPromo({ code: "SAVE10", discount: 10 });
-    } else if (promoCode.toUpperCase() === "SAVE20") {
-      setAppliedPromo({ code: "SAVE20", discount: 20 });
-    } else {
-      alert("Invalid promo code");
-    }
-  };
-
-  const removePromoCode = () => {
-    setAppliedPromo(null);
-    setPromoCode("");
   };
 
   // Loading state (while fetching cart)
@@ -187,12 +186,13 @@ const Page = () => {
   const discount = appliedPromo ? (subtotal * appliedPromo.discount) / 100 : 0;
   const shipping = subtotal > 50 ? 0 : 5.99;
   const tax = (subtotal - discount) * 0.08;
-  const total = subtotal - discount + shipping ;
+  const total = subtotal - discount + shipping;
 
   return (
     <section className="py-12 bg-gray-50 min-h-screen">
       <Container>
         {/* Page Header */}
+
         <div className="mb-8">
           <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
             Shopping Cart
@@ -344,8 +344,6 @@ const Page = () => {
                 Order Summary
               </h2>
 
-        
-
               {/* Price Breakdown */}
               <div className="space-y-3 mb-6 pb-6 border-b border-gray-200">
                 <div className="flex justify-between text-gray-600">
@@ -359,10 +357,6 @@ const Page = () => {
                     <span className="font-medium">-৳{discount.toFixed(2)}</span>
                   </div>
                 )}
-
-              
-
-            
               </div>
 
               {/* Total */}
