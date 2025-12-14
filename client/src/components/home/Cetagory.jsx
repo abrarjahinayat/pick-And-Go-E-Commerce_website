@@ -59,7 +59,7 @@ const Category = () => {
         <div className="flex flex-wrap gap-8 justify-center pt-8">
           {categories.map((category, index) => (
             <Link 
-              href={`/category/${category?.slug || category?._id}`} 
+              href={`/category/${category.slug}`} 
               key={category?._id || index}
               className="group"
             >
@@ -91,17 +91,7 @@ const Category = () => {
           ))}
         </div>
 
-        {/* View All Button */}
-        {categories.length > 0 && (
-          <div className="text-center mt-12">
-            <Link 
-              href="/categories"
-              className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-8 py-3 rounded-full hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-            >
-              View All Categories
-            </Link>
-          </div>
-        )}
+     
       </div>
     </section>
   )

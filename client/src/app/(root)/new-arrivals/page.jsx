@@ -4,13 +4,12 @@ import React from 'react'
 
 
  async function gellAllProducts() {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API}/products/allproducts`, { cache: 'no-store' })
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API}/products/leastproduct`, { cache: 'no-store' })
     const data = await res.json()
     return data
   }
 
-  console.log(process.env.NEXT_PUBLIC_API)
-
+  
 const page = async () => {
 
   let {data} = await gellAllProducts()
@@ -21,7 +20,7 @@ const page = async () => {
       <Container>
 
        <h2 className="text-4xl text-center py-10 font-bold text-gray-900 mb-3">
-            All Products
+            All New Arrival Products
           </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

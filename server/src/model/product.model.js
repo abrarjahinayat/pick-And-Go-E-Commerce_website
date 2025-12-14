@@ -31,9 +31,14 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: [true, "stock is required"],
     },
-    discountprice: {
-      type: Number,
-      default: 0,
+    productType: {
+      type: String,
+      enum: ["men", "women", "kids", "accessories"],
+     
+    },
+    isNew:{
+      type: Boolean,
+      default: false,
     },
     rating: {
       type: Number,

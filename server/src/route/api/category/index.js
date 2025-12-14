@@ -20,4 +20,6 @@ router.put("/updatecategory/:id", TokenCheckMiddleware, adminCheckMiddleware, up
 router.get("/getallcategory",  getallcategoryControllers);
 
 
+
+
 module.exports = router;
