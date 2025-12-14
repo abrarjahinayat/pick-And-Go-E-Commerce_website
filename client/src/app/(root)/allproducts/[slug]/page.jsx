@@ -371,14 +371,21 @@ const Page = () => {
                 </div>
               </div>
 
-              <div className="border-t border-gray-200 pt-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Description
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {product?.description || "High-quality product..."}
-                </p>
-              </div>
+          <div className="border-t border-gray-200 pt-6">
+  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+    Description
+  </h3>
+  <div className="space-y-4">
+    {product?.description 
+      ? product.description.split('\n\n').map((paragraph, index) => (
+          <p key={index} className="text-gray-600 leading-relaxed">
+            {paragraph}
+          </p>
+        ))
+      : <p className="text-gray-600 leading-relaxed">High-quality product...</p>
+    }
+  </div>
+</div>
 
               {/* Size */}
               {product?.variantType === "MultiVarient" && sizes.length > 0 && (

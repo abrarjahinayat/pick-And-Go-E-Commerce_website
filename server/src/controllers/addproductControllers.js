@@ -5,7 +5,7 @@ const path = require("path");
 const categoryModel = require("../model/category.model");
 const addproductControllers = async (req, res) => {
  try {
-    let { title, price, description, category, stock, productType, reviews, rating, variantType, variants , originalPrice, isNew } = req.body;
+    let { title, price, description, category, stock, productType, reviews, rating, variantType, variants , originalPrice, isNew, isFeatured } = req.body;
     let image = req.files;
 
     const imagePaths = req.files.map((item)=> {
@@ -36,7 +36,8 @@ const addproductControllers = async (req, res) => {
         variantType,
         variants,
         originalPrice,
-        isNew
+        isNew,
+        isFeatured
       });
       await addproduct.save();
       return res.status(201).json({
@@ -179,6 +180,24 @@ const getwomenproductsControllers = async (req, res) => {
   }
 };
 
+const featuredproductsControllers = async (req, res) => {
+  try {
+      let products = await productModel.find({isFeatured: true}).populate({path: 'variants', select: 'size color stock _id'}).limit(8);
+    return res.status(200).json({
+      success: true,
+      message: "All Product fetched successfully",
+      data: products,
+    });
+    
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message || error,
+    });
+  }
+};
+
 const getkidsproductsControllers = async (req, res) => {
   try {
       let products = await productModel.find({productType: "kids"}).populate({path: 'variants', select: 'size color stock _id'});
@@ -221,4 +240,4 @@ const getProductsByCategory = async (req, res) => {
 
 
 
-module.exports = { addproductControllers, getallproductControllers, getleastproductControllers, deleteproductControllers ,getproductbyslugControllers , getmenproductsControllers , getwomenproductsControllers , getkidsproductsControllers ,getProductsByCategory}; 
+module.exports = { addproductControllers, getallproductControllers, getleastproductControllers, deleteproductControllers ,getproductbyslugControllers , getmenproductsControllers , getwomenproductsControllers , getkidsproductsControllers ,getProductsByCategory, featuredproductsControllers }; 

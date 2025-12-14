@@ -22,9 +22,8 @@ const productSchema = new mongoose.Schema(
     price: {
       type: Number,
     },
-    originalPrice:{
+    originalPrice: {
       type: Number,
-
     },
     category: { type: mongoose.Types.ObjectId, ref: "Category" },
     stock: {
@@ -34,9 +33,8 @@ const productSchema = new mongoose.Schema(
     productType: {
       type: String,
       enum: ["men", "women", "kids", "accessories"],
-     
     },
-    isNew:{
+    isNew: {
       type: Boolean,
       default: false,
     },
@@ -53,6 +51,10 @@ const productSchema = new mongoose.Schema(
       enum: ["SingleVarient", "MultiVarient"],
       default: "none",
     },
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
 
     variants: [{ type: mongoose.Types.ObjectId, ref: "Variant" }],
   },
@@ -60,4 +62,3 @@ const productSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model("Products", productSchema);
- 

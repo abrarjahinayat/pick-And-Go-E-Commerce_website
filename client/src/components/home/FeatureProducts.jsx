@@ -5,14 +5,21 @@ import axios from 'axios'
 import Link from 'next/link'
 import { Heart, ShoppingCart, Eye } from 'lucide-react'
 import Container from '../common/Container'
+import { useSelector } from 'react-redux'
+import toast, { Toaster } from 'react-hot-toast'
+
+
 
 const FeatureProducts = () => {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [wishlistIds, setWishlistIds] = useState([])
+
+    const userId = useSelector((state) => state.user.value)
 
   useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_API}/products/allproducts`)
+      .get(`${process.env.NEXT_PUBLIC_API}/products/featuredproducts`, { cache: 'no-store' })
       .then((res) => {
         setProducts(res?.data?.data ?? [])
         setLoading(false)
@@ -27,9 +34,28 @@ const FeatureProducts = () => {
     console.log("Add to cart:", product)
   }
 
-  const handleWishlist = (product) => {
-    console.log("Add to wishlist:", product)
+ const handleWishlist = (product) => {
+  // prevent duplicate add
+  if (wishlistIds.includes(product._id)) {
+    toast.error("Already in wishlist")
+    return
   }
+
+  axios
+    .post(`${process.env.NEXT_PUBLIC_API}/wishlist/addtowishlist`, {
+      user: userId._id,
+      product: product._id,
+    })
+    .then(() => {
+      setWishlistIds((prev) => [...prev, product._id])
+      toast.success("Product added to wishlist ❤️")
+    })
+    .catch((err) => {
+      console.error(err)
+      toast.error("Failed to add to wishlist")
+    })
+}
+
 
   if (loading) {
     return (
@@ -46,6 +72,7 @@ const FeatureProducts = () => {
   return (
     <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
       <Container>
+          <Toaster position="top-right" />
         <div className="max-w-7xl mx-auto px-4">
 
           {/* Header */}
@@ -113,14 +140,20 @@ const FeatureProducts = () => {
 
                     {/* Hover Actions */}
                     <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition">
-                      <button
-                        onClick={() => handleWishlist(product)}
-                        className="bg-white p-2 rounded-full shadow hover:bg-red-500 hover:text-white"
-                      >
-                        <Heart size={18} />
-                      </button>
+                    <button
+  onClick={() => handleWishlist(product)}
+  className={`p-2 rounded-full shadow transition
+    ${
+      wishlistIds.includes(product._id)
+        ? "bg-red-500 text-white"
+        : "bg-white hover:bg-red-500 hover:text-white"
+    }`}
+>
+  <Heart size={18} />
+</button>
+
                       <Link
-                        href={`/product/${product?.slug || product?._id}`}
+                        href={`/allproducts/${product?.slug || product?._id}`}
                         className="bg-white p-2 rounded-full shadow hover:bg-blue-500 hover:text-white"
                       >
                         <Eye size={18} />

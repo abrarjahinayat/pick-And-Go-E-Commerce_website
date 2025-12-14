@@ -1,5 +1,5 @@
 const express = require("express");
-const { addproductControllers, getallproductControllers, getleastproductControllers, deleteproductControllers, getproductbyslugControllers, getmenproductsControllers, getwomenproductsControllers, getkidsproductsControllers, getProductsByCategory } = require("../../../controllers/addproductControllers");
+const { addproductControllers, getallproductControllers, getleastproductControllers, deleteproductControllers, getproductbyslugControllers, getmenproductsControllers, getwomenproductsControllers, getkidsproductsControllers, getProductsByCategory, featuredproductsControllers } = require("../../../controllers/addproductControllers");
 const upload = require("../../../utils/multer.img.upload");
 const router = express.Router();
 
@@ -15,6 +15,7 @@ router.get("/womenproducts",  getwomenproductsControllers );
 router.get("/kidsproducts",  getkidsproductsControllers );
 router.get("/accessoriesproducts",  getwomenproductsControllers );
 router.get("/category/:slug", getProductsByCategory);
+router.get("/featuredproducts", featuredproductsControllers )
 
 
 
