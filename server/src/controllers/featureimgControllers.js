@@ -13,7 +13,7 @@ const addfeatureimgControllers = async (req, res) => {
   try {
     let featureimg = await new featureimgModel({
       image: `${process.env.SERVER_URL}/${filename}`,
-      link,
+      link: `${process.env.FEATURE_PRODUCT_URL}/${link}`,
       title
     });
     await featureimg.save();
