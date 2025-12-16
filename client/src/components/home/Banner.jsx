@@ -35,19 +35,19 @@ const Banner = () => {
 
   return (
     <section className="my-6">
-      <Container>
+     
         <Slider {...settings}>
           {banners.map((item) => (
             <div key={item._id} className="w-full">
               <img
                 src={item.image}
                 alt="banner"
-                className="w-full h-[500px] object-cover rounded-xl object-cover"
+                className="w-full h-[600px] object-cover rounded-xl object-cover"
               />
             </div>
           ))}
         </Slider>
-      </Container>
+      
     </section>
   );
 };

@@ -44,7 +44,7 @@ const FeatureImage = () => {
   return (
     <section className="py-16 bg-white">
       <Container>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-15">
           {featureImages.map((feature, index) => (
             <Link
               href={feature?.link || '#'}

@@ -1,8 +1,14 @@
-import React from 'react'
+"use client"
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { Heart, ShoppingCart, Eye } from 'lucide-react'
+import { useSelector } from 'react-redux'
+import axios from 'axios'
+import toast, { Toaster } from 'react-hot-toast'
+
 
 const Products = ({ product }) => {
+   const userId = useSelector((state) => state.user.value)
   // ✅ Calculate discount percentage safely
   const discountPercent =
     product?.originalPrice &&
@@ -14,9 +20,38 @@ const Products = ({ product }) => {
             100
         )
       : null
+  const [wishlistIds, setWishlistIds] = useState([])
+       const handleWishlist = (product) => {
+  if(!userId) {
+    toast.error("Please login to add to wishlist")
+    return
+  }
+  // prevent duplicate add
+  if (wishlistIds.includes(product._id)) {
+    toast.error("Already in wishlist")
+    return
+  }
+
+  axios
+    .post(`${process.env.NEXT_PUBLIC_API}/wishlist/addtowishlist`, {
+      user: userId._id,
+      product: product._id,
+     
+    })
+    .then(() => {
+      setWishlistIds((prev) => [...prev, product._id])
+      toast.success("Product added to wishlist ❤️")
+    })
+    .catch((err) => {
+      console.error(err)
+      toast.error("Failed to add to wishlist")
+    })
+}
+ console.log(product._id)
 
   return (
     <div className="group relative bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden">
+       <Toaster position="top-right" />
       {/* Product Image */}
       <div className="relative overflow-hidden bg-gray-100">
         <Link href={`/allproducts/${product?.slug || product?._id}`}>
@@ -51,7 +86,7 @@ const Products = ({ product }) => {
 
         {/* Hover Actions */}
         <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button
+          <button onClick={() => handleWishlist(product)}
             className="bg-white p-2 rounded-full shadow-lg hover:bg-red-500 hover:text-white transition-all duration-300 transform hover:scale-110"
             aria-label="Add to wishlist"
           >

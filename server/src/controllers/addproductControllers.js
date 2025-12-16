@@ -318,6 +318,44 @@ const getProductsByCategoryAndSubCategory = async (req, res) => {
   }
 };
 
+const getSimilarProductsControllers = async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    // 1. Find current product
+    const product = await productModel.findOne({ slug });
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    // 2. Find similar products
+    const similarProducts = await productModel
+      .find({
+        _id: { $ne: product._id },              // exclude current product
+        category: product.category,             // same category
+        subcategory: product.subcategory,       // same subcategory
+      })
+      .populate("category subcategory")
+      .limit(4);
+
+    return res.status(200).json({
+      success: true,
+      message: "Similar products fetched successfully",
+      data: similarProducts,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message || error,
+    });
+  }
+};
+
 
 module.exports = {
   addproductControllers,
@@ -331,4 +369,5 @@ module.exports = {
   getProductsByCategory,
   featuredproductsControllers,
   getProductsByCategoryAndSubCategory,
+  getSimilarProductsControllers,
 };

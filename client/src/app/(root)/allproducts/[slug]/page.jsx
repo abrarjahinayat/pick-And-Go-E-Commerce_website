@@ -14,16 +14,16 @@ import {
   Minus,
 } from "lucide-react";
 import { useSelector } from "react-redux";
-import { toast } from "sonner"
-// import {io} from 'socket.io-client'
-
-// let socket = io("http://localhost:4000");
+import { toast } from "sonner";
+import Products from "@/components/common/Products";
 
 const Page = () => {
   const router = useRouter();
   const { slug } = useParams();
   const [product, setProduct] = useState(null);
+  const [similarProducts, setSimilarProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingSimilar, setLoadingSimilar] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("");
@@ -44,6 +44,22 @@ const Page = () => {
         console.error("Product Load Error:", err);
         setProduct(null);
         setLoading(false);
+      });
+  }, [slug]);
+
+  // Fetch similar products
+  useEffect(() => {
+    setLoadingSimilar(true);
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API}/products/similarproducts/${slug}`)
+      .then((res) => {
+        setSimilarProducts(res?.data?.data ?? []);
+        setLoadingSimilar(false);
+      })
+      .catch((err) => {
+        console.error("Similar Products Load Error:", err);
+        setSimilarProducts([]);
+        setLoadingSimilar(false);
       });
   }, [slug]);
 
@@ -135,14 +151,6 @@ const Page = () => {
         return;
       }
 
-      // prepare payload: prefer variant._id, otherwise send identifying fields
-      const variantPayload = selectedVariant._id
-        ? { variantId: selectedVariant._id }
-        : {
-            size: selectedVariant.size ?? selectedSize ?? null,
-            color: selectedVariant.color ?? selectedColor ?? null,
-          };
-
       const payload = {
         user: userId,
         product: product._id,
@@ -155,18 +163,6 @@ const Page = () => {
           `${process.env.NEXT_PUBLIC_API}/cart/addtocart`,
           payload
         );
-
-        // socket.emit("addToCart", payload);
-
-        // socket.on("addToCartResponse", (res) => {
-        //   if (res?.status === 200 || res?.status === 201) {
-        //     toast.success("Item added to cart successfully!");
-        //   } else {
-        //     console.warn("Add to cart response:", res);
-        //     toast.error("Failed to add item to cart.");
-        //   }
-        // });
-
 
         if (res?.status === 200 || res?.status === 201) {
           toast.success("Item added to cart successfully!");
@@ -189,7 +185,6 @@ const Page = () => {
     }
 
     // SINGLE VARIANT / SIMPLE PRODUCT
-    // do not include variant field here (backend expects only product and user)
     if (availableStock < quantity) {
       alert(`Only ${availableStock} items available`);
       return;
@@ -200,13 +195,11 @@ const Page = () => {
         user: userId,
         product: product._id,
         quantity,
-        // totalPrice: (product?.price ||product?.originalPrice)  * quantity,
       };
       const res = await axios.post(
         `${process.env.NEXT_PUBLIC_API}/cart/addtocart`,
         payload
       );
-      // socket.emit("addToCart", payload);
       if (res?.status === 200 || res?.status === 201) {
         toast.success("Item added to cart successfully!");
       } else {
@@ -273,7 +266,6 @@ const Page = () => {
   return (
     <section className="py-12 bg-gray-50">
       <Container>
-    
         <div className="bg-white rounded-2xl shadow-lg p-6 lg:p-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
             {/* Left */}
@@ -371,21 +363,21 @@ const Page = () => {
                 </div>
               </div>
 
-          <div className="border-t border-gray-200 pt-6">
-  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-    Description
-  </h3>
-  <div className="space-y-4">
-    {product?.description 
-      ? product.description.split('\n\n').map((paragraph, index) => (
-          <p key={index} className="text-gray-600 leading-relaxed">
-            {paragraph}
-          </p>
-        ))
-      : <p className="text-gray-600 leading-relaxed">High-quality product...</p>
-    }
-  </div>
-</div>
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Description
+                </h3>
+                <div className="space-y-4">
+                  {product?.description 
+                    ? product.description.split('\n\n').map((paragraph, index) => (
+                        <p key={index} className="text-gray-600 leading-relaxed">
+                          {paragraph}
+                        </p>
+                      ))
+                    : <p className="text-gray-600 leading-relaxed">High-quality product...</p>
+                  }
+                </div>
+              </div>
 
               {/* Size */}
               {product?.variantType === "MultiVarient" && sizes.length > 0 && (
@@ -627,6 +619,40 @@ const Page = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Similar Products Section */}
+        <div className="mt-16">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              You May Also Like
+            </h2>
+            <p className="text-gray-600">
+              Check out similar products based on your interest
+            </p>
+          </div>
+
+          {loadingSimilar ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {[...Array(4)].map((_, index) => (
+                <div key={index} className="animate-pulse">
+                  <div className="bg-gray-300 rounded-lg h-80 mb-4"></div>
+                  <div className="bg-gray-300 h-4 rounded w-3/4 mb-2"></div>
+                  <div className="bg-gray-300 h-4 rounded w-1/2"></div>
+                </div>
+              ))}
+            </div>
+          ) : similarProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {similarProducts.map((item) => (
+                <Products product={item} key={item._id} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-gray-50 rounded-xl">
+              <p className="text-gray-600">No similar products found</p>
+            </div>
+          )}
         </div>
       </Container>
     </section>
