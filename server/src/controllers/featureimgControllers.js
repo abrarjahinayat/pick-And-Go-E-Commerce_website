@@ -1,0 +1,42 @@
+
+const fs = require("fs");
+const path = require("path");
+const featureimgModel = require("../model/featureimg.model");
+
+// Add Banner Controller
+const addfeatureimgControllers = async (req, res) => {
+  let { link } = req.body;
+  let { filename } = req.file;
+  let {title} = req.body
+
+
+  try {
+    let featureimg = await new featureimgModel({
+      image: `${process.env.SERVER_URL}/${filename}`,
+      link,
+      title
+    });
+    await featureimg.save();
+
+    return res.status(201).json({
+      success: true,
+      message: "featureimg added successfully",
+      data: featureimg,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Server Error", error: error.message || error });
+  }
+};
+
+const getallfeatureimgControllers = async (req, res) => {
+    try {
+        let allfeatureimg = await featureimgModel.find({});
+        return res.status(200).json({success: true, message: "All featureimg", data: allfeatureimg});
+        
+    } catch (error) {
+        return res.status(500).json({message: "Server Error", error: error.message || error});
+    }
+}
+module.exports = { addfeatureimgControllers , getallfeatureimgControllers};

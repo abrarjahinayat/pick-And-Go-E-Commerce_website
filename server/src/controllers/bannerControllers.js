@@ -7,7 +7,6 @@ const addbannerControllers = async (req, res) => {
   let { link } = req.body;
   let { filename } = req.file;
 
-  console.log(filename);
 
   try {
     let banner = await new bannerModel({

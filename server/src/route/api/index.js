@@ -10,6 +10,7 @@ const coupon = require('./coupon');
 const cart = require('./cart');
 const order = require('./order');
 const wishlist = require('./wishlist');
+const feaureimg = require('./featureimg');
 
 router.use('/auth', auth);
 router.use('/banner', banner);
@@ -21,5 +22,6 @@ router.use('/coupon', coupon);
 router.use('/cart', cart);
 router.use('/order', order);
 router.use('/wishlist', wishlist);
+router.use('/featureimg', feaureimg);
 
 module.exports = router;

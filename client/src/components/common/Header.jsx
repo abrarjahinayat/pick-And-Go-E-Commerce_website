@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSelector } from "react-redux";
+import { usePathname } from "next/navigation";
 import { ShoppingCart, Search, User, Heart, Menu, LogOut } from "lucide-react";
 import axios from "axios";
 
@@ -9,6 +10,7 @@ const Header = () => {
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [cartData, setCartData] = useState([]);
   const user = useSelector((state) => state.user.value);
+  const pathname = usePathname();
 
   const handleLogout = () => {
     // Add your logout logic here
@@ -31,6 +33,16 @@ const Header = () => {
     [user?._id , cartData]
     
   );
+
+  const navItems = [
+    { href: "/new-arrivals", label: "New Arrivals" },
+    { href: "/allproducts", label: "All Products" },
+    { href: "/men", label: "Men" },
+    { href: "/women", label: "Women" },
+    { href: "/kids", label: "Kids" },
+    { href: "/accessories", label: "Accessories" },
+    { href: "/sale", label: "Sale 🔥", isSpecial: true },
+  ];
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -157,48 +169,42 @@ const Header = () => {
       <nav className="border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="hidden md:flex items-center justify-center space-x-8 h-12">
-            <Link
-              href="/new-arrivals"
-              className="text-sm font-medium hover:text-blue-600 transition"
-            >
-              New Arrivals
-            </Link>
-            <Link
-              href="/allproducts"
-              className="text-sm font-medium hover:text-blue-600 transition"
-            >
-              All Products
-            </Link>
-            <Link
-              href="/men"
-              className="text-sm font-medium hover:text-blue-600 transition"
-            >
-              Men
-            </Link>
-            <Link
-              href="/women"
-              className="text-sm font-medium hover:text-blue-600 transition"
-            >
-              Women
-            </Link>
-            <Link
-              href="/kids"
-              className="text-sm font-medium hover:text-blue-600 transition"
-            >
-              Kids
-            </Link>
-            <Link
-              href="/accessories"
-              className="text-sm font-medium hover:text-blue-600 transition"
-            >
-              Accessories
-            </Link>
-            <Link
-              href="/sale"
-              className="text-sm font-medium text-red-600 hover:text-red-700 transition"
-            >
-              Sale 🔥
-            </Link>
+            {navItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="relative text-sm font-medium transition group"
+                >
+                  <span
+                    className={`${
+                      item.isSpecial
+                        ? isActive
+                          ? "text-red-700"
+                          : "text-red-600 group-hover:text-red-700"
+                        : isActive
+                        ? "text-blue-600"
+                        : "text-gray-700 group-hover:text-blue-600"
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+                  {/* Active indicator */}
+                  <span
+                    className={`absolute bottom-[-13px] left-0 h-0.5 bg-gradient-to-r transition-all duration-300 ${
+                      item.isSpecial
+                        ? "from-red-500 to-red-600"
+                        : "from-blue-500 to-purple-600"
+                    } ${
+                      isActive
+                        ? "w-full opacity-100"
+                        : "w-0 group-hover:w-full opacity-0 group-hover:opacity-100"
+                    }`}
+                  ></span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </nav>
