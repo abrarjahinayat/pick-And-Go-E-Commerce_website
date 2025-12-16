@@ -3,23 +3,46 @@ const productModel = require("../model/product.model");
 const fs = require("fs");
 const path = require("path");
 const categoryModel = require("../model/category.model");
+const subcategoryModel = require("../model/subcategory.model");
 const addproductControllers = async (req, res) => {
- try {
-    let { title, price, description, category, stock, productType, reviews, rating, variantType, variants , originalPrice, isNew, isFeatured } = req.body;
+  try {
+    let {
+      title,
+      price,
+      description,
+      category,
+      subcategory,
+      stock,
+      productType,
+      reviews,
+      rating,
+      variantType,
+      variants,
+      originalPrice,
+      isNew,
+      isFeatured,
+    } = req.body;
     let image = req.files;
 
-    const imagePaths = req.files.map((item)=> {
-      return `${process.env.SERVER_URL}/${item.filename}` ;
-    })
+    const imagePaths = req.files.map((item) => {
+      return `${process.env.SERVER_URL}/${item.filename}`;
+    });
 
-
-    let slug = slugify(title, { 
+    let slug = slugify(title, {
       replacement: "-",
       remove: undefined,
       lower: true,
       trim: true,
     });
-    if (!title || !productType  || !description || !category || !image || !stock || !variantType) {
+    if (
+      !title ||
+      !productType ||
+      !description ||
+      !category ||
+      !image ||
+      !stock ||
+      !variantType
+    ) {
       return res.status(400).json({ message: "All fields are required" });
     } else {
       let addproduct = await new productModel({
@@ -27,7 +50,8 @@ const addproductControllers = async (req, res) => {
         price,
         description,
         category,
-        image : imagePaths,
+        subcategory,
+        image: imagePaths,
         slug,
         stock,
         productType,
@@ -37,7 +61,7 @@ const addproductControllers = async (req, res) => {
         variants,
         originalPrice,
         isNew,
-        isFeatured
+        isFeatured,
       });
       await addproduct.save();
       return res.status(201).json({
@@ -57,7 +81,9 @@ const addproductControllers = async (req, res) => {
 
 const getallproductControllers = async (req, res) => {
   try {
-    let products = await productModel.find({}).populate({path: 'variants', select: 'size color stock _id'});
+    let products = await productModel
+      .find({})
+      .populate({ path: "variants", select: "size color stock _id" });
     return res.status(200).json({
       success: true,
       message: "All Product fetched successfully",
@@ -74,7 +100,9 @@ const getallproductControllers = async (req, res) => {
 
 const getleastproductControllers = async (req, res) => {
   try {
-    let products = await productModel.find({isNew: true}).populate({path: 'variants', select: 'size color stock _id'})
+    let products = await productModel
+      .find({ isNew: true })
+      .populate({ path: "variants", select: "size color stock _id" });
     return res.status(200).json({
       success: true,
       message: "All Product fetched successfully",
@@ -87,18 +115,16 @@ const getleastproductControllers = async (req, res) => {
       error: error.message || error,
     });
   }
-}
-
+};
 
 const deleteproductControllers = async (req, res) => {
   try {
-
     let { id } = req.params;
 
     let findproduct = await productModel.findById(id);
 
-     findproduct.image.forEach((imgPath)=>{
-      const filename = imgPath.split('/').pop();
+    findproduct.image.forEach((imgPath) => {
+      const filename = imgPath.split("/").pop();
       const filepath = path.join(__dirname, "../../uploads", filename);
       fs.unlink(filepath, (err) => {
         if (err) {
@@ -107,7 +133,7 @@ const deleteproductControllers = async (req, res) => {
           console.log("File deleted successfully");
         }
       });
-     }) 
+    });
 
     await productModel.findByIdAndDelete(id);
 
@@ -115,7 +141,6 @@ const deleteproductControllers = async (req, res) => {
       success: true,
       message: "Product deleted successfully",
     });
-    
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -123,18 +148,21 @@ const deleteproductControllers = async (req, res) => {
       error: error.message || error,
     });
   }
-}
+};
 
 const getproductbyslugControllers = async (req, res) => {
   try {
-      let { slug } = req.params;
-       let products = await productModel.findOne({slug}).populate({path: 'variants', select: 'size color stock _id'}).sort({ createdAt:-1 }).limit(5);
+    let { slug } = req.params;
+    let products = await productModel
+      .findOne({ slug })
+      .populate({ path: "variants", select: "size color stock _id" })
+      .sort({ createdAt: -1 })
+      .limit(5);
     return res.status(200).json({
       success: true,
       message: "All Product fetched successfully",
       data: products,
     });
-    
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -142,17 +170,18 @@ const getproductbyslugControllers = async (req, res) => {
       error: error.message || error,
     });
   }
-}
+};
 
 const getmenproductsControllers = async (req, res) => {
   try {
-      let products = await productModel.find({productType: "men"}).populate({path: 'variants', select: 'size color stock _id'});
+    let products = await productModel
+      .find({ productType: "men" })
+      .populate({ path: "variants", select: "size color stock _id" });
     return res.status(200).json({
       success: true,
       message: "All Product fetched successfully",
       data: products,
     });
-    
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -164,13 +193,14 @@ const getmenproductsControllers = async (req, res) => {
 
 const getwomenproductsControllers = async (req, res) => {
   try {
-      let products = await productModel.find({productType: "women"}).populate({path: 'variants', select: 'size color stock _id'});
+    let products = await productModel
+      .find({ productType: "women" })
+      .populate({ path: "variants", select: "size color stock _id" });
     return res.status(200).json({
       success: true,
       message: "All Product fetched successfully",
       data: products,
     });
-    
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -182,13 +212,15 @@ const getwomenproductsControllers = async (req, res) => {
 
 const featuredproductsControllers = async (req, res) => {
   try {
-      let products = await productModel.find({isFeatured: true}).populate({path: 'variants', select: 'size color stock _id'}).limit(8);
+    let products = await productModel
+      .find({ isFeatured: true })
+      .populate({ path: "variants", select: "size color stock _id" })
+      .limit(8);
     return res.status(200).json({
       success: true,
       message: "All Product fetched successfully",
       data: products,
     });
-    
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -200,13 +232,14 @@ const featuredproductsControllers = async (req, res) => {
 
 const getkidsproductsControllers = async (req, res) => {
   try {
-      let products = await productModel.find({productType: "kids"}).populate({path: 'variants', select: 'size color stock _id'});
+    let products = await productModel
+      .find({ productType: "kids" })
+      .populate({ path: "variants", select: "size color stock _id" });
     return res.status(200).json({
       success: true,
       message: "All Product fetched successfully",
       data: products,
     });
-    
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -222,22 +255,80 @@ const getProductsByCategory = async (req, res) => {
 
     const category = await categoryModel.findOne({ slug });
     if (!category) {
-      return res.status(404).json({ success: false, message: "Category not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
     }
 
     const products = await productModel.find({ category: category._id });
 
     res.status(200).json({
       success: true,
-      category,
-      products,
+      massage: "All category Product fetched successfully",
+      data: products,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const getProductsByCategoryAndSubCategory = async (req, res) => {
+  try {
+    const { categorySlug, subcategorySlug } = req.params;
+
+    // 1. Find category
+    const category = await categoryModel.findOne({ slug: categorySlug });
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
+    // 2. Find subcategory under that category
+    const subcategory = await subcategoryModel.findOne({
+      slug: subcategorySlug,
+      category: category._id,
     });
 
+    if (!subcategory) {
+      return res.status(404).json({
+        success: false,
+        message: "SubCategory not found in this category",
+      });
+    }
+
+    // 3. Find products
+    const products = await productModel
+      .find({
+        category: category._id,
+        subcategory: subcategory._id,
+      })
+      .populate("category subcategory")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      category,
+      subcategory,
+      products,
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
 
-
-module.exports = { addproductControllers, getallproductControllers, getleastproductControllers, deleteproductControllers ,getproductbyslugControllers , getmenproductsControllers , getwomenproductsControllers , getkidsproductsControllers ,getProductsByCategory, featuredproductsControllers }; 
+module.exports = {
+  addproductControllers,
+  getallproductControllers,
+  getleastproductControllers,
+  deleteproductControllers,
+  getproductbyslugControllers,
+  getmenproductsControllers,
+  getwomenproductsControllers,
+  getkidsproductsControllers,
+  getProductsByCategory,
+  featuredproductsControllers,
+  getProductsByCategoryAndSubCategory,
+};

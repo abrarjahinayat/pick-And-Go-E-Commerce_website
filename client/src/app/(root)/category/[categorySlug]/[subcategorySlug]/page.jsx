@@ -3,9 +3,10 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Products from '@/components/common/Products';
+import Link from "next/link";
 
 export default function CategoryProducts() {
-  const { slug } = useParams();
+ const { categorySlug, subcategorySlug } = useParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,7 +18,7 @@ export default function CategoryProducts() {
         setError(null);
         
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API}/products/category/${slug}`,
+        `${process.env.NEXT_PUBLIC_API}/products/category/${categorySlug}/${subcategorySlug}`,
           {
             cache: 'no-store',
             headers: {
@@ -43,14 +44,14 @@ export default function CategoryProducts() {
       }
     };
 
-    if (slug) {
+    if (categorySlug, subcategorySlug) {
       fetchProducts();
     }
-  }, [slug]);
+  }, [categorySlug, subcategorySlug]);
 
   // Format category name for display
-  const formatCategoryName = (slug) => {
-    return slug
+  const formatCategoryName = (categorySlug, subcategorySlug) => {
+    return categorySlug, subcategorySlug
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
@@ -62,7 +63,7 @@ export default function CategoryProducts() {
         {/* Category Header */}
         <div className="text-center py-10">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            {formatCategoryName(slug)}
+            {formatCategoryName(categorySlug, subcategorySlug)}
           </h1>
           <p className="text-gray-600">
             {loading ? "Loading..." : `${products.length} Products Found`}
@@ -99,8 +100,8 @@ export default function CategoryProducts() {
             ))}
           </div>
         )}
-
-        {/* Empty State */}
+{/*  */}
+       
         {!loading && !error && products.length === 0 && (
           <div className="text-center py-20">
             <div className="max-w-md mx-auto">
@@ -109,14 +110,14 @@ export default function CategoryProducts() {
                 No Products Found
               </h3>
               <p className="text-gray-600 mb-6">
-                We couldn't find any products in the "{formatCategoryName(slug)}" category.
+                We couldn't find any products in the "{formatCategoryName(categorySlug, subcategorySlug)}" category.
               </p>
-              <a
+              <Link
                 href="/"
                 className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
               >
                 Back to Home
-              </a>
+              </Link>
             </div>
           </div>
         )}

@@ -35,6 +35,10 @@ const FeatureProducts = () => {
   }
 
  const handleWishlist = (product) => {
+  if(!userId) {
+    toast.error("Please login to add to wishlist")
+    return
+  }
   // prevent duplicate add
   if (wishlistIds.includes(product._id)) {
     toast.error("Already in wishlist")

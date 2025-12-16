@@ -9,6 +9,7 @@ import axios from "axios";
 const Header = () => {
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [cartData, setCartData] = useState([]);
+  const [wishlistData, setWishlistData] = useState([]);
   const user = useSelector((state) => state.user.value);
   const pathname = usePathname();
 
@@ -31,6 +32,22 @@ const Header = () => {
         });
     },
     [user?._id , cartData]
+    
+  );
+
+  useEffect(
+    () => {
+      axios
+        .get(`${process.env.NEXT_PUBLIC_API}/wishlist/getsinglewishlist/${user?._id}`)
+        .then((res) => {
+          // Handle the response if needed
+          setWishlistData(res?.data?.data);
+        })
+        .catch((err) => {
+          console.error("Error fetching wishlist data:", err);
+        });
+    },
+    [user?._id , wishlistData]
     
   );
 
@@ -144,7 +161,7 @@ const Header = () => {
             >
               <Heart className="w-5 h-5" />
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                3
+               {wishlistData?.length || 0}
               </span>
             </Link>
 

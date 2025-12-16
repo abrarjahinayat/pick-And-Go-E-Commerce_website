@@ -50,10 +50,22 @@ const removewishlistControllers = async (req, res) => {
      }
 };
 
+const getsinglewishlistControllers = async (req, res) => {
+    try {
+        let { id } = req.params;
+        let getsinglewishlist = await wishlistModel.find( {user: id});
+        return res.status(200).json({ success: true, message: "Single wishlist product get successfully" , data: getsinglewishlist});
+        
+     } catch (error) {
+        return res.status(500).json({ success: false, message: "Server Error", error: error.message || error});
+     }
+}
+
 module.exports = {
   addtowishlistControllers,
     getwishlistControllers,
     deletewishlistControllers,
-    removewishlistControllers
+    removewishlistControllers,
+    getsinglewishlistControllers
 
 };
