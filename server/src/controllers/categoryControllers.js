@@ -7,7 +7,8 @@ const path = require("path");
 const addcategoryControllers = async (req, res) => {
   try {
     let { filename } = req.file;
-    let { name } = req.body;
+    let { name , isActive } = req.body;
+
 
     let slug = slugify(name, {
       replacement: "-",
@@ -19,6 +20,7 @@ const addcategoryControllers = async (req, res) => {
     let addcategory = await new categoryModel({
       image: `${process.env.SERVER_URL}/${filename}`,
       name,
+      isActive,
       slug,
     });
     await addcategory.save();
@@ -126,7 +128,7 @@ const updatecategoryControllers = async (req, res) => {
 // Get All Category Controller
 const getallcategoryControllers = async (req, res) => {
   try {
-    let allcategory = await categoryModel.find({}).populate({
+    let allcategory = await categoryModel.find({isActive : true}).populate({
       path: "subcategory",
       select : "name slug",
     });

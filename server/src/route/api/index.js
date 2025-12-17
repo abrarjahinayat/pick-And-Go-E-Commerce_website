@@ -11,6 +11,7 @@ const cart = require('./cart');
 const order = require('./order');
 const wishlist = require('./wishlist');
 const feaureimg = require('./featureimg');
+const productCollectionBanner = require('./productCollectionBanner');
 
 router.use('/auth', auth);
 router.use('/banner', banner);
@@ -23,5 +24,6 @@ router.use('/cart', cart);
 router.use('/order', order);
 router.use('/wishlist', wishlist);
 router.use('/featureimg', feaureimg);
+router.use('/productCollectionBanner', productCollectionBanner);
 
 module.exports = router;

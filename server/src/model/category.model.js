@@ -15,6 +15,10 @@ const categorySchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
     subcategory: [{ type: mongoose.Types.ObjectId, ref: "SubCategory" }],
   },
   { timestamps: true }
