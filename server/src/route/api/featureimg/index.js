@@ -3,7 +3,7 @@ const path = require("path");
 
 
 const upload = require("../../../utils/multer.img.upload");
-const { addfeatureimgControllers, getallfeatureimgControllers } = require("../../../controllers/featureimgControllers");
+const { addfeatureimgControllers, getallfeatureimgControllers, getnextThreefeatureimgControllers } = require("../../../controllers/featureimgControllers");
 
 
 const router = express.Router();
@@ -14,6 +14,12 @@ const router = express.Router();
 // Add Banner Route
 router.post("/addfeatureimg", upload.single("featureimg"), addfeatureimgControllers );
 
+// Get Frist 6 Banner Route
+router.get("/getallfeatureimg", getallfeatureimgControllers );
+
+// Get Next 3 Banner Route
+router.get("/getnextThreefeatureimg", getnextThreefeatureimgControllers );
+
 // Delete Banner Route
 // router.delete("/deletebanner/:id", TokenCheckMiddleware, adminCheckMiddleware, deletebannerControllers); 
 
@@ -21,7 +27,5 @@ router.post("/addfeatureimg", upload.single("featureimg"), addfeatureimgControll
 
 // router.patch("/updatebanner/:id", TokenCheckMiddleware, adminCheckMiddleware, upload.single("banner"), updatebannerControllers )
 
-// Get All Banner Route
-router.get("/getallfeatureimg", getallfeatureimgControllers );
 
 module.exports = router;
