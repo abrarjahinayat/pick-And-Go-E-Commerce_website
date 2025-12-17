@@ -13,6 +13,7 @@ const {
   getProductsByCategoryAndSubCategory,
   getSimilarProductsControllers,
   getCategoryPoloControllers,
+  getCategoryKurtiTopsControllers,
 } = require("../../../controllers/addproductControllers");
 const upload = require("../../../utils/multer.img.upload");
 const router = express.Router();
@@ -35,5 +36,5 @@ router.get(
 router.get("/featuredproducts", featuredproductsControllers);
 router.get("/similarproducts/:slug", getSimilarProductsControllers);
 router.get("/categorypolo/:slug", getCategoryPoloControllers );
-
+router.get("/categorykurtitops/:slug", getCategoryKurtiTopsControllers );
 module.exports = router;
