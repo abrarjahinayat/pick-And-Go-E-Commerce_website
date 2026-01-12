@@ -3,8 +3,10 @@ import Category from '@/components/home/Cetagory'
 import Comfort from '@/components/home/Comfort'
 import FeatureImage from '@/components/home/FeatureImage'
 import FeatureImage2 from '@/components/home/FeatureImage2'
+import FeatureImage3 from '@/components/home/FeatureImages3'
 import FeatureProducts from '@/components/home/FeatureProducts'
 import KurtiTopsSection from '@/components/home/KurtiTopsSection'
+import PanjabiSection from '@/components/home/PanjabiSection'
 import PoloSection from '@/components/home/PoloSection'
 
 import React from 'react'
@@ -20,6 +22,8 @@ const page = () => {
         <PoloSection/>
         <KurtiTopsSection/>
         <FeatureImage2/>
+        <PanjabiSection/>
+        <FeatureImage3/>
     </div>
   )
 }

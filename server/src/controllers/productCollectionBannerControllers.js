@@ -50,4 +50,13 @@ const getkurtitopsBanner = async (req, res)=>{
     }
 }
 
-module.exports = { addproductCollectionBanner , getdesignerpoloBanner , getkurtitopsBanner };
+const getpanjabiBanner = async (req, res)=>{
+    try {
+        let panjabiBanner = await productsCollectionBanner.find({title: "Panjabi"});
+        return res.status(200).json({success: true, message: "Panjabi Banner get successfully", data: panjabiBanner});
+        
+    } catch (error) {
+        return res.status(500).json({success: false, message: "Server Error", error: error.message || error});
+    }
+}
+module.exports = { addproductCollectionBanner , getdesignerpoloBanner , getkurtitopsBanner, getpanjabiBanner };

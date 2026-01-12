@@ -50,6 +50,16 @@ const getnextThreefeatureimgControllers = async (req, res) => {
     }
 }
 
+const getnextsixfeatureimgControllers = async (req, res) => {
+    try {
+        let allfeatureimg = await featureimgModel.find({}).skip(9).limit(6);
+        return res.status(200).json({success: true, message: "All featureimg", data: allfeatureimg});
+        
+    } catch (error) {
+        return res.status(500).json({message: "Server Error", error: error.message || error});
+    }
+}
 
 
-module.exports = { addfeatureimgControllers , getallfeatureimgControllers , getnextThreefeatureimgControllers };
+
+module.exports = { addfeatureimgControllers , getallfeatureimgControllers , getnextThreefeatureimgControllers , getnextsixfeatureimgControllers };
