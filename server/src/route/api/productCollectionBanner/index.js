@@ -3,7 +3,7 @@ const path = require("path");
 
 
 const upload = require("../../../utils/multer.img.upload");
-const { addproductCollectionBanner, getdesignerpoloBanner, getkurtitopsBanner, getpanjabiBanner, getcargodenimsBanner } = require("../../../controllers/productCollectionBannerControllers");
+const { addproductCollectionBanner, getdesignerpoloBanner, getkurtitopsBanner, getpanjabiBanner, getcargodenimsBanner, getlittleonesteesBanner } = require("../../../controllers/productCollectionBannerControllers");
 
 
 
@@ -30,6 +30,9 @@ router.get("/getpanjabibanner", getpanjabiBanner  );
 // Get Cargo Denims Banner Route
 
 router.get("/getcargodenimsbanner", getcargodenimsBanner  );
+
+// Little Ones Tees
+router.get("/getlittleonesteesbanner", getlittleonesteesBanner   );
 
 
 module.exports = router;

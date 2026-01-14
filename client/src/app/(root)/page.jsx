@@ -8,6 +8,7 @@ import FeatureImage2 from '@/components/home/FeatureImage2'
 import FeatureImage3 from '@/components/home/FeatureImages3'
 import FeatureProducts from '@/components/home/FeatureProducts'
 import KurtiTopsSection from '@/components/home/KurtiTopsSection'
+import LittleOnesTeesSection from '@/components/home/LittleOnesTeesSection'
 import PanjabiSection from '@/components/home/PanjabiSection'
 import PoloSection from '@/components/home/PoloSection'
 
@@ -28,6 +29,7 @@ const page = () => {
         <FeatureImage3/>
         <CargoDenimSection/>
         <AccessoriesFeatureImg/>
+        <LittleOnesTeesSection/>
     </div>
   )
 }

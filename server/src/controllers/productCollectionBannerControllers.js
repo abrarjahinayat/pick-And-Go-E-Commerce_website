@@ -69,4 +69,14 @@ const getcargodenimsBanner = async (req, res)=>{
         return res.status(500).json({success: false, message: "Server Error", error: error.message || error});
     }
 }
-module.exports = { addproductCollectionBanner , getdesignerpoloBanner , getkurtitopsBanner, getpanjabiBanner , getcargodenimsBanner };
+
+const getlittleonesteesBanner = async (req, res)=>{
+    try {
+        let littleonesteesBanner = await productsCollectionBanner.find({title: "Little Ones Tees"});
+        return res.status(200).json({success: true, message: "Little Ones Tees Banner get successfully", data: littleonesteesBanner});
+        
+    } catch (error) {
+        return res.status(500).json({success: false, message: "Server Error", error: error.message || error});
+    }
+}
+module.exports = { addproductCollectionBanner , getdesignerpoloBanner , getkurtitopsBanner, getpanjabiBanner , getcargodenimsBanner , getlittleonesteesBanner };
