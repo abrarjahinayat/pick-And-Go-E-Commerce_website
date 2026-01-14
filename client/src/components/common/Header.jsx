@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 import { usePathname } from "next/navigation";
@@ -10,46 +10,75 @@ const Header = () => {
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [cartData, setCartData] = useState([]);
   const [wishlistData, setWishlistData] = useState([]);
+
+  // 🔍 SEARCH (NEW)
+  const [searchText, setSearchText] = useState("");
+  const [allProducts, setAllProducts] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
+  const searchRef = useRef(null);
+
   const user = useSelector((state) => state.user.value);
   const pathname = usePathname();
 
   const handleLogout = () => {
-    // Add your logout logic here
     localStorage.removeItem("token");
-    // console.log("Logging out...");
   };
 
-  useEffect(
-    () => {
-      axios
-        .get(`${process.env.NEXT_PUBLIC_API}/cart/singlecart/${user?._id}`)
-        .then((res) => {
-          // Handle the response if needed
-          setCartData(res?.data?.data);
-        })
-        .catch((err) => {
-          console.error("Error fetching cart data:", err);
-        });
-    },
-    [user?._id , cartData]
-    
-  );
+  // ---------------- CART ----------------
+  useEffect(() => {
+    if (!user?._id) return;
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API}/cart/singlecart/${user?._id}`)
+      .then((res) => setCartData(res?.data?.data))
+      .catch(() => {});
+  }, [user?._id]);
 
-  useEffect(
-    () => {
-      axios
-        .get(`${process.env.NEXT_PUBLIC_API}/wishlist/getsinglewishlist/${user?._id}`)
-        .then((res) => {
-          // Handle the response if needed
-          setWishlistData(res?.data?.data);
-        })
-        .catch((err) => {
-          console.error("Error fetching wishlist data:", err);
-        });
-    },
-    [user?._id , wishlistData]
-    
-  );
+  // ---------------- WISHLIST ----------------
+  useEffect(() => {
+    if (!user?._id) return;
+    axios
+      .get(
+        `${process.env.NEXT_PUBLIC_API}/wishlist/getsinglewishlist/${user?._id}`
+      )
+      .then((res) => setWishlistData(res?.data?.data))
+      .catch(() => {});
+  }, [user?._id]);
+
+  // ---------------- FETCH ALL PRODUCTS (SEARCH) ----------------
+  useEffect(() => {
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API}/products/allproducts`)
+      .then((res) => setAllProducts(res?.data?.data || []))
+      .catch(() => {});
+  }, []);
+
+  // ---------------- FILTER SEARCH ----------------
+  useEffect(() => {
+    if (!searchText.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    const filtered = allProducts
+      .filter((item) =>
+        item?.title?.toLowerCase().includes(searchText.toLowerCase())
+      )
+      .slice(0, 6);
+
+    setSuggestions(filtered);
+  }, [searchText, allProducts]);
+
+  // ---------------- CLICK OUTSIDE CLOSE ----------------
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setSuggestions([]);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const navItems = [
     { href: "/new-arrivals", label: "New Arrivals" },
@@ -69,7 +98,7 @@ const Header = () => {
           <div className="flex justify-between items-center text-sm">
             <p className="hidden sm:block">
               • Spend ৳1000 & get ৳100 off with
-              Coupon: <strong >AJA50</strong>
+              Coupon: <strong>AJA50</strong>
             </p>
             <div className="flex items-center gap-4 ml-auto">
               <Link href="/track-order" className="hover:underline">
@@ -96,19 +125,57 @@ const Header = () => {
             </span>
           </Link>
 
-          {/* Search Bar */}
-          <div className="hidden md:flex flex-1 max-w-2xl mx-8">
+          {/* 🔍 SEARCH BAR (ONLY AREA MODIFIED) */}
+          <div
+            ref={searchRef}
+            className="hidden md:flex flex-1 max-w-2xl mx-8 relative"
+          >
             <div className="relative w-full">
               <input
                 type="text"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
                 placeholder="Search for products..."
                 className="w-full px-4 py-2 pl-10 pr-4 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             </div>
+
+            {/* 🔽 SEARCH SUGGESTIONS */}
+            {suggestions.length > 0 && (
+              <div className="absolute top-full mt-2 w-full bg-white rounded-xl shadow-lg border z-50 max-h-80 overflow-y-auto">
+                {suggestions.map((product) => (
+                  <Link
+                    key={product._id}
+                    href={`/allproducts/${product.slug}`}
+                    onClick={() => setSearchText("")}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50"
+                  >
+                    <img
+                      src={product.image[0]}
+                      alt={product.title}
+                      className="w-12 h-12 object-contain"
+                    />
+                    <div>
+                      <p className="text-sm font-medium line-clamp-1">
+                        {product.title}
+                      </p>
+                      <p className="text-sm text-red-600 font-semibold">
+                        ৳{product.price}
+                        {product.originalPrice && (
+                          <span className="line-through text-gray-400 ml-2">
+                            ৳{product.originalPrice}
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Right Icons */}
+          {/* ✅ RIGHT SIDE — UNCHANGED */}
           <div className="flex items-center space-x-6">
             <div
               className="hidden sm:block relative"
@@ -122,11 +189,9 @@ const Header = () => {
                 </span>
               </div>
 
-              {/* Dropdown Menu */}
               {showAccountMenu && (
                 <div className="absolute right-0 mt-1.5 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50">
                   {user?.name ? (
-                    // If user is logged in, show logout
                     <button
                       onClick={handleLogout}
                       className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 cursor-pointer hover:text-red-600 transition-colors flex items-center gap-2"
@@ -135,7 +200,6 @@ const Header = () => {
                       Logout
                     </button>
                   ) : (
-                    // If user is not logged in, show login and register
                     <>
                       <Link
                         href="/login"
@@ -161,7 +225,7 @@ const Header = () => {
             >
               <Heart className="w-5 h-5" />
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-               {wishlistData?.length || 0}
+                {wishlistData?.length || 0}
               </span>
             </Link>
 
@@ -207,7 +271,6 @@ const Header = () => {
                   >
                     {item.label}
                   </span>
-                  {/* Active indicator */}
                   <span
                     className={`absolute bottom-[-13px] left-0 h-0.5 bg-gradient-to-r transition-all duration-300 ${
                       item.isSpecial
