@@ -15,6 +15,8 @@ const {
   getCategoryPoloControllers,
   getCategoryKurtiTopsControllers,
   getCategoryPanjabiControllers,
+  getCategoryCargoDenimsControllers,
+  accessoriesproductsControllers,
 } = require("../../../controllers/addproductControllers");
 const upload = require("../../../utils/multer.img.upload");
 const router = express.Router();
@@ -28,7 +30,7 @@ router.get("/productslug/:slug", getproductbyslugControllers);
 router.get("/menproducts", getmenproductsControllers);
 router.get("/womenproducts", getwomenproductsControllers);
 router.get("/kidsproducts", getkidsproductsControllers);
-router.get("/accessoriesproducts", getwomenproductsControllers);
+router.get("/accessoriesproducts", accessoriesproductsControllers );
 router.get("/category/:slug", getProductsByCategory);
 router.get(
   "/category/:categorySlug/:subcategorySlug",
@@ -39,4 +41,5 @@ router.get("/similarproducts/:slug", getSimilarProductsControllers);
 router.get("/categorypolo/:slug", getCategoryPoloControllers );
 router.get("/categorykurtitops/:slug", getCategoryKurtiTopsControllers );
 router.get("/categorypanjabi/:slug", getCategoryPanjabiControllers );
+router.get("/categorycargodenims/:slug", getCategoryCargoDenimsControllers  );
 module.exports = router;

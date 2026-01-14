@@ -210,6 +210,24 @@ const getwomenproductsControllers = async (req, res) => {
   }
 };
 
+const accessoriesproductsControllers = async (req, res) => {
+  try {
+    let products = await productModel
+      .find({ productType: "accessories" })
+      .populate({ path: "variants", select: "size color stock _id" });
+    return res.status(200).json({
+      success: true,
+      message: "All Product fetched successfully",
+      data: products,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message || error,
+    });
+  }
+};
 const featuredproductsControllers = async (req, res) => {
   try {
     let products = await productModel
@@ -458,6 +476,39 @@ const getCategoryPanjabiControllers = async (req, res) => {
   }
 }
 
+const getCategoryCargoDenimsControllers = async (req, res) => {
+   try {
+    const { slug } = req.params;
+
+    // 1. find category by slug
+    const category = await categoryModel.findOne({ slug });
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
+    // 2. find products by category _id
+    const products = await productModel
+      .find({ category: category._id })
+      .populate("category subcategory").limit(5);
+
+    return res.status(200).json({
+      success: true,
+      category: category.name,
+      data: products,
+    });
+  } 
+  catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message || error,
+    })
+  }
+}
 
 module.exports = {
   addproductControllers,
@@ -474,5 +525,7 @@ module.exports = {
   getSimilarProductsControllers,
   getCategoryPoloControllers,
   getCategoryKurtiTopsControllers,
-  getCategoryPanjabiControllers
+  getCategoryPanjabiControllers ,
+  getCategoryCargoDenimsControllers,
+  accessoriesproductsControllers
 };

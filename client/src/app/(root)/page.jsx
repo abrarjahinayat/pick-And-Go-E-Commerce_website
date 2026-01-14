@@ -1,4 +1,6 @@
+import AccessoriesFeatureImg from '@/components/home/AccessoriesFeatureImg'
 import Banner from '@/components/home/Banner'
+import CargoDenimSection from '@/components/home/CargoDenimSection'
 import Category from '@/components/home/Cetagory'
 import Comfort from '@/components/home/Comfort'
 import FeatureImage from '@/components/home/FeatureImage'
@@ -24,6 +26,8 @@ const page = () => {
         <FeatureImage2/>
         <PanjabiSection/>
         <FeatureImage3/>
+        <CargoDenimSection/>
+        <AccessoriesFeatureImg/>
     </div>
   )
 }

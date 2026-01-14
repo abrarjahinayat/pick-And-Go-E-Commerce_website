@@ -157,7 +157,7 @@ const KurtiTopsSection = () => {
 
               {/* View More Card */}
               <Link
-                href="/category/polo"
+                href="/category/kurti-tunic-and-tops"
                 className="group relative bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex items-center justify-center h-64"
               >
                 <div className="text-center p-6">
