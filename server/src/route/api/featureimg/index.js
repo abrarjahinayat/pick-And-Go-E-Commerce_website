@@ -3,7 +3,7 @@ const path = require("path");
 
 
 const upload = require("../../../utils/multer.img.upload");
-const { addfeatureimgControllers, getallfeatureimgControllers, getnextThreefeatureimgControllers, getnextsixfeatureimgControllers, getaccessoriesfeatureimgControllers } = require("../../../controllers/featureimgControllers");
+const { addfeatureimgControllers, getallfeatureimgControllers, getnextThreefeatureimgControllers, getnextsixfeatureimgControllers, getaccessoriesfeatureimgControllers, getkidsfeatureimgControllers } = require("../../../controllers/featureimgControllers");
 
 
 const router = express.Router();
@@ -26,6 +26,10 @@ router.get("/getnextsixfeatureimg", getnextsixfeatureimgControllers );
 // Get Accessories Banner Route
 
 router.get("/getaccessoriesfeatureimg", getaccessoriesfeatureimgControllers );
+
+// Get kids banner Route
+
+router.get("/getkidsfeatureimg", getkidsfeatureimgControllers  );
 
 
 // Delete Banner Route

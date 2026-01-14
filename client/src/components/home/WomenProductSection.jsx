@@ -4,7 +4,7 @@ import axios from 'axios'
 import Link from 'next/link'
 import Container from '../common/Container'
 
-const LittleOnesTeesSection = () => {
+const WomenProductSection = () => {
   const [bannerData, setBannerData] = useState(null)
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -12,7 +12,7 @@ const LittleOnesTeesSection = () => {
   useEffect(() => {
     // Fetch banner
     axios
-      .get(`${process.env.NEXT_PUBLIC_API}/productCollectionBanner/getlittleonesteesbanner`, { cache: 'no-store' })
+      .get(`${process.env.NEXT_PUBLIC_API}/productCollectionBanner/getwomenproductsbanner`, { cache: 'no-store' })
       .then((res) => {
         setBannerData(res?.data?.data?.[0] || null)
       
@@ -24,7 +24,7 @@ const LittleOnesTeesSection = () => {
 
     // Fetch panjabi products
     axios
-      .get(`${process.env.NEXT_PUBLIC_API}/products/category/kids-polo`, { cache: 'no-store' })
+      .get(`${process.env.NEXT_PUBLIC_API}/products/category/women-t-shirt`, { cache: 'no-store' })
       .then((res) => {
         const poloProducts = res?.data?.data ?? []
         // Take first 7 products (6 + 1 for "View More" card)
@@ -157,7 +157,7 @@ const LittleOnesTeesSection = () => {
 
               {/* View More Card */}
               <Link
-                href="/category/kids-polo"
+                href="/category/women-t-shirt"
                 className="group relative bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex items-center justify-center h-64"
               >
                 <div className="text-center p-6">
@@ -195,4 +195,4 @@ const LittleOnesTeesSection = () => {
   )
 }
 
-export default LittleOnesTeesSection
+export default WomenProductSection

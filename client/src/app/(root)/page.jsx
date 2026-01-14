@@ -7,10 +7,14 @@ import FeatureImage from '@/components/home/FeatureImage'
 import FeatureImage2 from '@/components/home/FeatureImage2'
 import FeatureImage3 from '@/components/home/FeatureImages3'
 import FeatureProducts from '@/components/home/FeatureProducts'
+import Footer from '@/components/home/Footer'
+import KidsFeatureImg from '@/components/home/KidsFeatureImg'
 import KurtiTopsSection from '@/components/home/KurtiTopsSection'
 import LittleOnesTeesSection from '@/components/home/LittleOnesTeesSection'
 import PanjabiSection from '@/components/home/PanjabiSection'
 import PoloSection from '@/components/home/PoloSection'
+import PremiumSocksSection from '@/components/home/PremiumSocksSection'
+import WomenProductSection from '@/components/home/WomenProductSection'
 
 import React from 'react'
 
@@ -30,6 +34,10 @@ const page = () => {
         <CargoDenimSection/>
         <AccessoriesFeatureImg/>
         <LittleOnesTeesSection/>
+        <PremiumSocksSection/>
+        <KidsFeatureImg/>
+        <WomenProductSection/>
+        <Footer/>
     </div>
   )
 }

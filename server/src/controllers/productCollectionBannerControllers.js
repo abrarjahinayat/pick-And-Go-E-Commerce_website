@@ -79,4 +79,24 @@ const getlittleonesteesBanner = async (req, res)=>{
         return res.status(500).json({success: false, message: "Server Error", error: error.message || error});
     }
 }
-module.exports = { addproductCollectionBanner , getdesignerpoloBanner , getkurtitopsBanner, getpanjabiBanner , getcargodenimsBanner , getlittleonesteesBanner };
+
+const getpremiumsockesBanner = async (req, res)=>{
+    try {
+        let premiumsockesBanner = await productsCollectionBanner.find({title: "Premium Sockes"});
+        return res.status(200).json({success: true, message: "Premium Sockes Banner get successfully", data: premiumsockesBanner});
+        
+    } catch (error) {
+        return res.status(500).json({success: false, message: "Server Error", error: error.message || error});
+    }
+}
+
+const getwomenproductsBanner = async (req, res)=>{
+    try {
+        let womenproductsBanner = await productsCollectionBanner.find({title: "Women Products"});
+        return res.status(200).json({success: true, message: "Women Products Banner get successfully", data: womenproductsBanner});
+        
+    } catch (error) {
+        return res.status(500).json({success: false, message: "Server Error", error: error.message || error});
+    }
+}
+module.exports = { addproductCollectionBanner , getdesignerpoloBanner , getkurtitopsBanner, getpanjabiBanner , getcargodenimsBanner , getlittleonesteesBanner , getpremiumsockesBanner , getwomenproductsBanner };
