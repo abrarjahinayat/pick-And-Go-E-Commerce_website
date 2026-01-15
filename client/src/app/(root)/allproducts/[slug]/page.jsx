@@ -336,11 +336,11 @@ const Page = () => {
 
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-4xl font-bold text-gray-900">
-                    ${product?.price ?? "0.00"}
+                    ৳{product?.price ?? "0.00"}
                   </span>
                   {product?.originalPrice && (
                     <span className="text-xl text-gray-500 line-through">
-                      ${product.originalPrice}
+                      ৳{product.originalPrice}
                     </span>
                   )}
                 </div>

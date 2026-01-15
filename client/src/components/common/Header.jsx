@@ -31,7 +31,7 @@ const Header = () => {
       .get(`${process.env.NEXT_PUBLIC_API}/cart/singlecart/${user?._id}`)
       .then((res) => setCartData(res?.data?.data))
       .catch(() => {});
-  }, [user?._id]);
+  }, [user?._id, cartData]);
 
   // ---------------- WISHLIST ----------------
   useEffect(() => {
@@ -42,7 +42,7 @@ const Header = () => {
       )
       .then((res) => setWishlistData(res?.data?.data))
       .catch(() => {});
-  }, [user?._id]);
+  }, [user?._id , wishlistData]);
 
   // ---------------- FETCH ALL PRODUCTS (SEARCH) ----------------
   useEffect(() => {
@@ -135,7 +135,7 @@ const Header = () => {
                 type="text"
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
-                placeholder="Search for products..."
+                placeholder="Search for products by Title or Tags..."
                 className="w-full px-4 py-2 pl-10 pr-4 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -192,6 +192,7 @@ const Header = () => {
               {showAccountMenu && (
                 <div className="absolute right-0 mt-1.5 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50">
                   {user?.name ? (
+                    <>
                     <button
                       onClick={handleLogout}
                       className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 cursor-pointer hover:text-red-600 transition-colors flex items-center gap-2"
@@ -199,6 +200,15 @@ const Header = () => {
                       <LogOut className="w-4 h-4" />
                       Logout
                     </button>
+
+                        <Link
+                        href="/orders"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                      >
+                        My Orders
+                      </Link>
+                    </>
+                    
                   ) : (
                     <>
                       <Link

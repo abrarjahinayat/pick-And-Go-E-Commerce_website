@@ -296,6 +296,41 @@ const getSingleorderControllers = async (req, res) => {
   }
 };
 
+const getSingleuserorderControllers = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const order = await orderModel
+      .find({ user: id })
+      .populate({ path: "user", select: "name email _id" })
+      .populate({
+        path: "items.product",
+        select: "title image price discountprice _id",
+      })
+      .populate({ path: "items.variants", select: "size color stock _id" }).sort({ createdAt: -1 });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "SingleUser order fetched successfully",
+      data: order,
+    });
+    
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   ordereControllers,
   getallordersControllers,
@@ -303,4 +338,5 @@ module.exports = {
   orderfailControllers,
   ordercancelControllers,
   getSingleorderControllers,
+  getSingleuserorderControllers
 };

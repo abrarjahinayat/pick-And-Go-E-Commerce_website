@@ -192,13 +192,13 @@ const FeatureProducts = () => {
 
                     <div className="flex items-center gap-2">
                       <span className="text-lg font-bold">
-                        ${product?.price}
+                        ৳{product?.price}
                       </span>
 
                       {product?.originalPrice &&
                         product.originalPrice > product.price && (
                           <span className="text-sm line-through text-gray-400">
-                            ${product.originalPrice}
+                            ৳{product.originalPrice}
                           </span>
                         )}
                     </div>

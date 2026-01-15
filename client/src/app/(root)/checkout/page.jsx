@@ -92,7 +92,7 @@ const Page = () => {
   // Fetch cities
   useEffect(() => {
     axios
-      .get("https://bdapis.com/api/v1.2/districts")
+      .get("https://bdapi.vercel.app/api/v.1/district")
       .then((res) => {
         setCity(res.data.data);
       })
@@ -101,10 +101,12 @@ const Page = () => {
       });
   }, []);
 
+
+
   // Fetch divisions
   useEffect(() => {
     axios
-      .get("https://bdapis.com/api/v1.2/divisions")
+      .get("https://bdapi.vercel.app/api/v.1/division")
       .then((res) => {
         setDivisions(res.data.data);
       })
@@ -421,8 +423,9 @@ const Page = () => {
                     >
                       <option value="">Select a city</option>
                       {city.map((item) => (
-                        <option key={item.district} value={item.district}>
-                          {item.district}
+                        <option key={item.disctrict} value={item.disctrict}>
+                          {item.name}
+                          
                         </option>
                       ))}
                     </select>
@@ -445,7 +448,7 @@ const Page = () => {
                       <option value="">Select a division</option>
                       {divisions.map((item) => (
                         <option key={item.division} value={item.division}>
-                          {item.division}
+                          {item.name}
                         </option>
                       ))}
                     </select>
