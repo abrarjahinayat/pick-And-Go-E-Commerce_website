@@ -291,7 +291,7 @@ const Page = () => {
             <ArrowLeft className="w-5 h-5" />
             Back to Cart
           </Link>
-          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl lg:text-4xl font-bold text-gray-900 lg:mb-2">
             Checkout
           </h1>
           <p className="text-gray-600">Enter your shipping information</p>
@@ -445,7 +445,7 @@ const Page = () => {
                       onChange={handleShippingChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      <option value="">Select a division</option>
+                      <option  value="">Select a division</option>
                       {divisions.map((item) => (
                         <option key={item.division} value={item.division}>
                           {item.name}
@@ -454,7 +454,7 @@ const Page = () => {
                     </select>
                   </div>
 
-                  {/* ZIP Code */}
+                  {/* ZIP Code
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       ZIP Code
@@ -467,7 +467,7 @@ const Page = () => {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="1000"
                     />
-                  </div>
+                  </div> */}
                 </div>
 
                 {/* Payment Method */}
@@ -589,7 +589,7 @@ const Page = () => {
               {/* Total */}
               <div className="flex justify-between items-center">
                 <span className="text-xl font-bold text-gray-900">Total</span>
-                <span className="text-3xl font-bold text-gray-900">
+                <span className="lg:text-3xl text-2xl font-bold text-gray-900">
                   ৳{total.toFixed(2)}
                 </span>
               </div>

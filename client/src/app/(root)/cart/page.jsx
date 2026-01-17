@@ -137,13 +137,13 @@ const Page = () => {
   // Loading state (while fetching cart)
   if (loading) {
     return (
-      <section className="py-16 bg-gray-50 min-h-screen">
+      <section className="py-8 sm:py-12 md:py-16 bg-gray-50 min-h-screen">
         <Container>
-          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-6 sm:p-8 md:p-12 text-center">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">
               Loading your cart...
             </h2>
-            <p className="text-gray-600">Please wait a moment.</p>
+            <p className="text-sm sm:text-base text-gray-600">Please wait a moment.</p>
           </div>
         </Container>
       </section>
@@ -153,21 +153,21 @@ const Page = () => {
   // If cart is empty
   if (!cartItems.length) {
     return (
-      <section className="py-16 bg-gray-50 min-h-screen">
+      <section className="py-8 sm:py-12 md:py-16 bg-gray-50 min-h-screen">
         <Container>
-          <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-6 sm:p-8 md:p-12 text-center">
             <div className="max-w-md mx-auto">
-              <ShoppingBag className="w-24 h-24 mx-auto text-gray-300 mb-6" />
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              <ShoppingBag className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto text-gray-300 mb-4 sm:mb-6" />
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">
                 Your Cart is Empty
               </h2>
-              <p className="text-gray-600 mb-8">
+              <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
                 Looks like you haven't added anything to your cart yet. Start
                 shopping to fill it up!
               </p>
               <Link
                 href="/allproducts"
-                className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-8 py-3 rounded-full hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-6 sm:px-8 py-2.5 sm:py-3 rounded-full hover:shadow-lg transform hover:scale-105 transition-all duration-300 text-sm sm:text-base"
               >
                 Continue Shopping
               </Link>
@@ -189,32 +189,31 @@ const Page = () => {
   const total = subtotal - discount + shipping;
 
   return (
-    <section className="py-12 bg-gray-50 min-h-screen">
+    <section className="py-6 px-2 lg:px-0 sm:py-8 md:py-12 bg-gray-50 min-h-screen">
       <Container>
         {/* Page Header */}
-
-        <div className="mb-8">
-          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1 sm:mb-2">
             Shopping Cart
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600">
             {cartItems.length} {cartItems.length === 1 ? "item" : "items"} in
             your cart
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {/* Cart Items - Left Column */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-3 sm:space-y-4">
             {cartItems.map((item) => (
               <div
                 key={item._id}
-                className="bg-white rounded-xl shadow-md p-4 lg:p-6 hover:shadow-lg transition-shadow duration-300"
+                className="bg-white rounded-lg sm:rounded-xl shadow-md p-3 sm:p-4 lg:p-6 hover:shadow-lg transition-shadow duration-300"
               >
-                <div className="flex gap-4">
+                <div className="flex gap-3 sm:gap-4">
                   {/* Product Image */}
                   <Link href={`/product/${item._id}`} className="flex-shrink-0">
-                    <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-lg overflow-hidden bg-gray-100">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 rounded-lg overflow-hidden bg-gray-100">
                       <img
                         src={item.image}
                         alt={item.title}
@@ -225,32 +224,32 @@ const Page = () => {
 
                   {/* Product Details */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex justify-between gap-4 mb-2">
+                    <div className="flex justify-between gap-2 sm:gap-4 mb-1 sm:mb-2">
                       <Link
                         href={`/product/${item._id}`}
-                        className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors line-clamp-2"
+                        className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors line-clamp-2"
                       >
                         {item.title}
                       </Link>
                       <button
                         onClick={() => removeItem(item._id)}
-                        className="flex-shrink-0 text-red-500 hover:text-red-700 transition-colors p-2 hover:bg-red-50 rounded-lg"
+                        className="flex-shrink-0 text-red-500 hover:text-red-700 transition-colors p-1 sm:p-2 hover:bg-red-50 rounded-lg"
                         aria-label="Remove item"
                       >
-                        <Trash2 className="w-5 h-5" />
+                        <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
                     </div>
 
                     {/* Variant Info */}
                     {(item.size || item.color) && (
-                      <div className="flex flex-wrap gap-2 mb-3 text-sm text-gray-600">
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2 sm:mb-3 text-xs sm:text-sm text-gray-600">
                         {item.size && (
-                          <span className="bg-gray-100 px-3 py-1 rounded-full">
+                          <span className="bg-gray-100 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
                             Size: {item.size}
                           </span>
                         )}
                         {item.color && (
-                          <span className="bg-gray-100 px-3 py-1 rounded-full">
+                          <span className="bg-gray-100 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
                             Color: {item.color}
                           </span>
                         )}
@@ -259,38 +258,38 @@ const Page = () => {
 
                     {/* Product Item */}
                     {item.quantity && (
-                      <span className="bg-gray-100 px-3 text-sm text-gray-600 py-1 rounded-full">
+                      <span className="inline-block bg-gray-100 px-2 sm:px-3 text-xs sm:text-sm text-gray-600 py-0.5 sm:py-1 rounded-full mb-2">
                         Item: {item.quantity}
                       </span>
                     )}
 
                     {/* Price and Quantity */}
-                    <div className="flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4">
                       {/* Price */}
-                      <div className="flex items-center gap-2">
-                        <span className="text-2xl font-bold text-gray-900">
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
                           ৳{item.price.toFixed(2)}
                         </span>
                         {item.originalPrice && (
-                          <span className="text-sm text-gray-500 line-through">
+                          <span className="text-xs sm:text-sm text-gray-500 line-through">
                             ৳{item.originalPrice.toFixed(2)}
                           </span>
                         )}
                       </div>
 
                       {/* Quantity Controls */}
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 sm:gap-3">
                         <div className="flex items-center border-2 border-gray-300 rounded-lg">
                           <button
                             onClick={() =>
                               updateQuantity(item, item.quantity - 1)
                             }
                             disabled={item.quantity <= 1}
-                            className="p-2 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="p-1.5 sm:p-2 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            <Minus className="w-4 h-4" />
+                            <Minus className="w-3 h-3 sm:w-4 sm:h-4" />
                           </button>
-                          <span className="px-4 py-2 font-semibold min-w-[3rem] text-center">
+                          <span className="px-3 sm:px-4 py-1.5 sm:py-2 font-semibold min-w-[2.5rem] sm:min-w-[3rem] text-center text-sm sm:text-base">
                             {item.quantity}
                           </span>
                           <button
@@ -298,9 +297,9 @@ const Page = () => {
                               updateQuantity(item, item.quantity + 1)
                             }
                             disabled={item.quantity >= item.stock}
-                            className="p-2 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="p-1.5 sm:p-2 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            <Plus className="w-4 h-4" />
+                            <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                           </button>
                         </div>
                       </div>
@@ -308,17 +307,17 @@ const Page = () => {
 
                     {/* Stock Warning */}
                     {item.quantity >= item.stock && (
-                      <p className="text-xs text-red-600 mt-2">
+                      <p className="text-[10px] sm:text-xs text-red-600 mt-1 sm:mt-2">
                         Maximum quantity reached ({item.stock} available)
                       </p>
                     )}
 
                     {/* Item Total */}
-                    <div className="mt-3 text-right">
-                      <span className="text-sm text-gray-600">
+                    <div className="mt-2 sm:mt-3 text-right">
+                      <span className="text-xs sm:text-sm text-gray-600">
                         Item Total:{" "}
                       </span>
-                      <span className="text-lg font-bold text-gray-900">
+                      <span className="text-base sm:text-lg font-bold text-gray-900">
                         ৳{(item.price * item.quantity).toFixed(2)}
                       </span>
                     </div>
@@ -329,30 +328,30 @@ const Page = () => {
 
             {/* Continue Shopping Button */}
             <Link
-              href="/allproducts"
-              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
+              href="/"
+              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors text-sm sm:text-base"
             >
-              <ArrowRight className="w-5 h-5 rotate-180" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 rotate-180" />
               Continue Shopping
             </Link>
           </div>
 
           {/* Order Summary - Right Column */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-lg p-6 sticky top-24">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            <div className="bg-white rounded-lg sm:rounded-xl shadow-lg p-4 sm:p-5 md:p-6 sticky top-20 sm:top-24">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">
                 Order Summary
               </h2>
 
               {/* Price Breakdown */}
-              <div className="space-y-3 mb-6 pb-6 border-b border-gray-200">
-                <div className="flex justify-between text-gray-600">
+              <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6 pb-4 sm:pb-6 border-b border-gray-200">
+                <div className="flex justify-between text-sm sm:text-base text-gray-600">
                   <span>Subtotal</span>
                   <span className="font-medium">৳{subtotal.toFixed(2)}</span>
                 </div>
 
                 {appliedPromo && (
-                  <div className="flex justify-between text-green-600">
+                  <div className="flex justify-between text-sm sm:text-base text-green-600">
                     <span>Discount ({appliedPromo.discount}%)</span>
                     <span className="font-medium">-৳{discount.toFixed(2)}</span>
                   </div>
@@ -360,19 +359,19 @@ const Page = () => {
               </div>
 
               {/* Total */}
-              <div className="flex justify-between items-center mb-6">
-                <span className="text-xl font-bold text-gray-900">Total</span>
-                <span className="text-3xl font-bold text-gray-900">
+              <div className="flex justify-between items-center mb-4 sm:mb-6">
+                <span className="text-lg sm:text-xl font-bold text-gray-900">Total</span>
+                <span className="text-2xl sm:text-3xl font-bold text-gray-900">
                   ৳{total.toFixed(2)}
                 </span>
               </div>
 
               {/* Free Shipping Banner */}
               {subtotal < 50 && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-2.5 sm:p-3 mb-3 sm:mb-4">
                   <div className="flex items-start gap-2">
-                    <Truck className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-blue-800">
+                    <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs sm:text-sm text-blue-800">
                       Add{" "}
                       <span className="font-bold">
                         ৳{(50 - subtotal).toFixed(2)}
@@ -387,18 +386,18 @@ const Page = () => {
               {/* Checkout Button */}
               <Link
                 href="/checkout"
-                className="block w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white text-center font-semibold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 mb-4"
+                className="block w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white text-center font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 mb-3 sm:mb-4 text-sm sm:text-base"
               >
                 Proceed to Checkout
               </Link>
 
               {/* Security Icons */}
               <div className="text-center">
-                <p className="text-xs text-gray-500 mb-2">Secure Checkout</p>
-                <div className="flex justify-center gap-2 text-gray-400">
-                  <span className="text-2xl">🔒</span>
-                  <span className="text-2xl">💳</span>
-                  <span className="text-2xl">✓</span>
+                <p className="text-[10px] sm:text-xs text-gray-500 mb-1.5 sm:mb-2">Secure Checkout</p>
+                <div className="flex justify-center gap-1.5 sm:gap-2 text-gray-400">
+                  <span className="text-xl sm:text-2xl">🔒</span>
+                  <span className="text-xl sm:text-2xl">💳</span>
+                  <span className="text-xl sm:text-2xl">✓</span>
                 </div>
               </div>
             </div>

@@ -232,15 +232,15 @@ const Page = () => {
 
   if (loading) {
     return (
-      <section className="py-12 bg-gray-50">
+      <section className="py-6 sm:py-8 md:py-12 bg-gray-50">
         <Container>
           <div className="animate-pulse">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="bg-gray-300 h-96 rounded-lg"></div>
-              <div className="space-y-4">
-                <div className="bg-gray-300 h-8 w-3/4 rounded"></div>
-                <div className="bg-gray-300 h-6 w-1/2 rounded"></div>
-                <div className="bg-gray-300 h-32 rounded"></div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
+              <div className="bg-gray-300 h-64 sm:h-80 md:h-96 rounded-lg"></div>
+              <div className="space-y-3 sm:space-y-4">
+                <div className="bg-gray-300 h-6 sm:h-8 w-3/4 rounded"></div>
+                <div className="bg-gray-300 h-4 sm:h-6 w-1/2 rounded"></div>
+                <div className="bg-gray-300 h-24 sm:h-32 rounded"></div>
               </div>
             </div>
           </div>
@@ -251,10 +251,10 @@ const Page = () => {
 
   if (!product) {
     return (
-      <section className="py-12">
+      <section className="py-8 sm:py-12">
         <Container>
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
               Product not found
             </h2>
           </div>
@@ -264,32 +264,32 @@ const Page = () => {
   }
 
   return (
-    <section className="py-12 bg-gray-50">
+    <section className="py-6 sm:py-8 md:py-12 bg-gray-50">
       <Container>
-        <div className="bg-white rounded-2xl shadow-lg p-6 lg:p-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            {/* Left */}
-            <div className="space-y-4">
-              <div className="relative overflow-hidden rounded-xl bg-gray-100 aspect-square">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg p-3 sm:p-4 md:p-6 lg:p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 lg:gap-12">
+            {/* Left - Images */}
+            <div className="space-y-3 sm:space-y-4">
+              <div className="relative overflow-hidden rounded-lg sm:rounded-xl bg-gray-100 aspect-square">
                 <img
                   src={imagesArray[selectedImage]}
                   alt={product?.title || product?.name}
                   className="w-full h-full object-cover"
                 />
                 {product?.discount && (
-                  <div className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-4 py-2 rounded-full">
+                  <div className="absolute top-2 sm:top-3 md:top-4 left-2 sm:left-3 md:left-4 bg-red-500 text-white text-xs sm:text-sm font-bold px-2 sm:px-3 md:px-4 py-1 sm:py-2 rounded-full">
                     -{product.discount}% OFF
                   </div>
                 )}
               </div>
 
               {imagesArray.length > 1 && (
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-4 gap-2 sm:gap-3">
                   {imagesArray.map((img, index) => (
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}
-                      className={`relative overflow-hidden rounded-lg aspect-square border-2 transition-all ${
+                      className={`relative overflow-hidden rounded-md sm:rounded-lg aspect-square border-2 transition-all ${
                         selectedImage === index
                           ? "border-blue-600 ring-2 ring-blue-200"
                           : "border-gray-200 hover:border-gray-400"
@@ -306,20 +306,20 @@ const Page = () => {
               )}
             </div>
 
-            {/* Right */}
-            <div className="space-y-6">
+            {/* Right - Product Info */}
+            <div className="space-y-4 sm:space-y-5 md:space-y-6">
               <div>
-                <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
+                <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 sm:mb-3">
                   {product?.title || product?.name}
                 </h1>
 
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                   <div className="flex items-center gap-1">
-                    <div className="flex text-yellow-400 text-lg">
+                    <div className="flex text-yellow-400 text-sm sm:text-base md:text-lg">
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
-                          className={`w-5 h-5 ${
+                          className={`w-4 h-4 sm:w-5 sm:h-5 ${
                             i < Math.floor(product?.rating || 4)
                               ? "fill-yellow-400"
                               : "fill-gray-300"
@@ -327,19 +327,19 @@ const Page = () => {
                         />
                       ))}
                     </div>
-                    <span className="text-sm text-gray-600 ml-2">
+                    <span className="text-xs sm:text-sm text-gray-600 ml-1 sm:ml-2">
                       {product?.rating || 4.5} ({product?.reviews || 128}{" "}
                       reviews)
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="text-4xl font-bold text-gray-900">
+                <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                  <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
                     ৳{product?.price ?? "0.00"}
                   </span>
                   {product?.originalPrice && (
-                    <span className="text-xl text-gray-500 line-through">
+                    <span className="text-base sm:text-lg md:text-xl text-gray-500 line-through">
                       ৳{product.originalPrice}
                     </span>
                   )}
@@ -347,7 +347,7 @@ const Page = () => {
 
                 <div className="flex items-center gap-2">
                   <span
-                    className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+                    className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
                       availableStock > 0
                         ? "bg-green-100 text-green-700"
                         : "bg-red-100 text-red-700"
@@ -363,18 +363,18 @@ const Page = () => {
                 </div>
               </div>
 
-              <div className="border-t border-gray-200 pt-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              <div className="border-t border-gray-200 pt-4 sm:pt-5 md:pt-6">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
                   Description
                 </h3>
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {product?.description 
                     ? product.description.split('\n\n').map((paragraph, index) => (
-                        <p key={index} className="text-gray-600 leading-relaxed">
+                        <p key={index} className="text-sm sm:text-base text-gray-600 leading-relaxed">
                           {paragraph}
                         </p>
                       ))
-                    : <p className="text-gray-600 leading-relaxed">High-quality product...</p>
+                    : <p className="text-sm sm:text-base text-gray-600 leading-relaxed">High-quality product...</p>
                   }
                 </div>
               </div>
@@ -382,7 +382,7 @@ const Page = () => {
               {/* Size */}
               {product?.variantType === "MultiVarient" && sizes.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                  <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">
                     Select Size <span className="text-red-500">*</span>
                   </h3>
                   <div className="flex flex-wrap gap-2">
@@ -398,7 +398,7 @@ const Page = () => {
                             setQuantity(1);
                           }}
                           disabled={!sizeHasStock}
-                          className={`px-6 py-2 rounded-lg border-2 font-medium transition-all ${
+                          className={`px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-lg border-2 text-xs sm:text-sm md:text-base font-medium transition-all ${
                             selectedSize === size
                               ? "border-blue-600 bg-blue-50 text-blue-600"
                               : sizeHasStock
@@ -417,7 +417,7 @@ const Page = () => {
               {/* Color */}
               {product?.variantType === "MultiVarient" && colors.length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                  <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">
                     Select Color <span className="text-red-500">*</span>
                   </h3>
                   <div className="flex flex-wrap gap-2">
@@ -436,7 +436,7 @@ const Page = () => {
                             setQuantity(1);
                           }}
                           disabled={!colorHasStock}
-                          className={`px-6 py-2 rounded-lg border-2 font-medium transition-all ${
+                          className={`px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-lg border-2 text-xs sm:text-sm md:text-base font-medium transition-all ${
                             selectedColor === color
                               ? "border-blue-600 bg-blue-50 text-blue-600"
                               : colorHasStock
@@ -454,49 +454,49 @@ const Page = () => {
 
               {/* Quantity */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">
                   Quantity
                 </h3>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
                   <div className="flex items-center border-2 border-gray-300 rounded-lg">
                     <button
                       onClick={decrementQuantity}
-                      className="p-3 hover:bg-gray-100 transition-colors"
+                      className="p-2 sm:p-3 hover:bg-gray-100 transition-colors"
                       disabled={quantity <= 1}
                     >
-                      <Minus className="w-4 h-4" />
+                      <Minus className="w-3 h-3 sm:w-4 sm:h-4" />
                     </button>
-                    <span className="px-6 py-2 font-semibold text-lg">
+                    <span className="px-4 sm:px-6 py-1.5 sm:py-2 font-semibold text-base sm:text-lg">
                       {quantity}
                     </span>
                     <button
                       onClick={incrementQuantity}
-                      className="p-3 hover:bg-gray-100 transition-colors"
+                      className="p-2 sm:p-3 hover:bg-gray-100 transition-colors"
                       disabled={quantity >= availableStock}
                     >
-                      <Plus className="w-4 h-4" />
+                      <Plus className="w-3 h-3 sm:w-4 sm:h-4" />
                     </button>
                   </div>
-                  <span className="text-sm text-gray-600">
+                  <span className="text-xs sm:text-sm text-gray-600">
                     {availableStock} pieces available
                   </span>
                 </div>
               </div>
 
               {/* Actions */}
-              <div className="flex gap-3 pt-4">
+              <div className="flex gap-2 sm:gap-3 pt-3 sm:pt-4">
                 <button
                   onClick={handleAddToCart}
                   disabled={availableStock <= 0}
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 sm:py-4 px-4 sm:px-6 rounded-lg sm:rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 text-sm sm:text-base"
                 >
-                  <ShoppingCart className="w-5 h-5" /> Add to Cart
+                  <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" /> Add to Cart
                 </button>
                 <button
                   onClick={handleAddToWishlist}
-                  className="bg-gray-100 text-gray-900 font-semibold p-4 rounded-xl hover:bg-red-50 hover:text-red-600 transition-all duration-300 transform hover:scale-105"
+                  className="bg-gray-100 text-gray-900 font-semibold p-3 sm:p-4 rounded-lg sm:rounded-xl hover:bg-red-50 hover:text-red-600 transition-all duration-300 transform hover:scale-105"
                 >
-                  <Heart className="w-6 h-6" />
+                  <Heart className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
               </div>
 
@@ -504,8 +504,8 @@ const Page = () => {
               {product?.variantType === "MultiVarient" &&
                 ((sizes.length > 0 && !selectedSize) ||
                   (colors.length > 0 && !selectedColor)) && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                    <p className="text-sm text-yellow-800">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 sm:p-3">
+                    <p className="text-xs sm:text-sm text-yellow-800">
                       Please select{" "}
                       {sizes.length > 0 && !selectedSize && "size"}
                       {sizes.length > 0 &&
@@ -520,38 +520,38 @@ const Page = () => {
                 )}
 
               {/* Features */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-gray-200">
-                <div className="flex items-center gap-3">
-                  <div className="bg-blue-100 p-3 rounded-lg">
-                    <Truck className="w-5 h-5 text-blue-600" />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-gray-200">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="bg-blue-100 p-2 sm:p-3 rounded-lg">
+                    <Truck className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">
+                    <p className="text-xs sm:text-sm font-semibold text-gray-900">
                       Free Shipping
                     </p>
-                    <p className="text-xs text-gray-600">On orders over $50</p>
+                    <p className="text-[10px] sm:text-xs text-gray-600">On orders over $50</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="bg-green-100 p-3 rounded-lg">
-                    <Shield className="w-5 h-5 text-green-600" />
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="bg-green-100 p-2 sm:p-3 rounded-lg">
+                    <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">
+                    <p className="text-xs sm:text-sm font-semibold text-gray-900">
                       Secure Payment
                     </p>
-                    <p className="text-xs text-gray-600">100% secure</p>
+                    <p className="text-[10px] sm:text-xs text-gray-600">100% secure</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="bg-purple-100 p-3 rounded-lg">
-                    <RefreshCw className="w-5 h-5 text-purple-600" />
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="bg-purple-100 p-2 sm:p-3 rounded-lg">
+                    <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">
+                    <p className="text-xs sm:text-sm font-semibold text-gray-900">
                       Easy Returns
                     </p>
-                    <p className="text-xs text-gray-600">30-day return</p>
+                    <p className="text-[10px] sm:text-xs text-gray-600">30-day return</p>
                   </div>
                 </div>
               </div>
@@ -559,13 +559,13 @@ const Page = () => {
           </div>
 
           {/* Additional details */}
-          <div className="mt-12 pt-8 border-t border-gray-200">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="mt-8 sm:mt-10 md:mt-12 pt-6 sm:pt-8 border-t border-gray-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">
                   Product Details
                 </h3>
-                <div className="space-y-2 text-sm">
+                <div className="space-y-2 text-xs sm:text-sm">
                   <div className="flex justify-between py-2 border-b border-gray-100">
                     <span className="text-gray-600">SKU:</span>
                     <span className="font-medium text-gray-900">
@@ -607,10 +607,10 @@ const Page = () => {
               </div>
 
               <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">
                   Shipping Information
                 </h3>
-                <div className="space-y-3 text-sm text-gray-600">
+                <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-600">
                   <p>• Free standard shipping on orders over $50</p>
                   <p>• Express shipping available at checkout</p>
                   <p>• Estimated delivery: 3-7 business days</p>
@@ -622,35 +622,35 @@ const Page = () => {
         </div>
 
         {/* Similar Products Section */}
-        <div className="mt-16">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="mt-10 sm:mt-12 md:mt-16">
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
               You May Also Like
             </h2>
-            <p className="text-gray-600">
+            <p className="text-sm sm:text-base text-gray-600">
               Check out similar products based on your interest
             </p>
           </div>
 
           {loadingSimilar ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
               {[...Array(4)].map((_, index) => (
                 <div key={index} className="animate-pulse">
-                  <div className="bg-gray-300 rounded-lg h-80 mb-4"></div>
-                  <div className="bg-gray-300 h-4 rounded w-3/4 mb-2"></div>
-                  <div className="bg-gray-300 h-4 rounded w-1/2"></div>
+                  <div className="bg-gray-300 rounded-lg h-48 sm:h-64 md:h-80 mb-3 sm:mb-4"></div>
+                  <div className="bg-gray-300 h-3 sm:h-4 rounded w-3/4 mb-2"></div>
+                  <div className="bg-gray-300 h-3 sm:h-4 rounded w-1/2"></div>
                 </div>
               ))}
             </div>
           ) : similarProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
               {similarProducts.map((item) => (
                 <Products product={item} key={item._id} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 bg-gray-50 rounded-xl">
-              <p className="text-gray-600">No similar products found</p>
+            <div className="text-center py-8 sm:py-10 md:py-12 bg-gray-50 rounded-xl">
+              <p className="text-sm sm:text-base text-gray-600">No similar products found</p>
             </div>
           )}
         </div>
