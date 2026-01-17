@@ -4,7 +4,7 @@ import axios from 'axios'
 import Link from 'next/link'
 import Container from '../common/Container'
 
-const FeatureImage2 = () => {
+const FeatureImage = () => {
   const [featureImages, setFeatureImages] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -42,9 +42,9 @@ const FeatureImage2 = () => {
   }
 
   return (
-    <section className="py-16 bg-white">
+    <section className="lg:py-16 px-2 lg:px-0 bg-white">
       <Container>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-15">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3 lg:gap-y-15">
           {featureImages.map((feature, index) => (
             <Link
               href={feature?.link || '#'}
@@ -104,4 +104,4 @@ const FeatureImage2 = () => {
   )
 }
 
-export default FeatureImage2
+export default FeatureImage
