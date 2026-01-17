@@ -31,23 +31,32 @@ const Banner = () => {
     pauseOnHover: true,
     arrows: true,
     cssEase: "ease-in-out",
+    responsive: [
+      {
+        breakpoint: 768,
+        settings: {
+          arrows: false,
+          dots: true,
+        }
+      }
+    ]
   };
 
   return (
-    <section className="my-6">
-     
+    <section className="my-4 sm:my-6">
+      <div className="px-2 sm:px-0">
         <Slider {...settings}>
           {banners.map((item) => (
             <div key={item._id} className="w-full">
               <img
                 src={item.image}
                 alt="banner"
-                className="w-full h-[600px] object-cover rounded-xl object-cover"
+                className="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[600px] object-cover rounded-lg sm:rounded-xl"
               />
             </div>
           ))}
         </Slider>
-      
+      </div>
     </section>
   );
 };

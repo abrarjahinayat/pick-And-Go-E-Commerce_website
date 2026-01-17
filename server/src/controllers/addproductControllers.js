@@ -544,6 +544,63 @@ const getpremiumsockesControllers = async (req, res) => {
   }
 }
 
+const getallmencategoryControllers = async (req, res) => {
+  try {
+    const categories = await productModel.aggregate([
+      // 1️⃣ only men products
+      {
+        $match: { productType: "men" },
+      },
+
+      // 2️⃣ join category collection
+      {
+        $lookup: {
+          from: "categories", // collection name (IMPORTANT)
+          localField: "category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+
+      // 3️⃣ unwind category array
+      { $unwind: "$category" },
+
+      // 4️⃣ group by category name (unique)
+      {
+        $group: {
+          _id: "$category.name",
+        },
+      },
+
+      // 5️⃣ rename field
+      {
+        $project: {
+          _id: 0,
+          name: "$_id",
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      message: "Unique men category names fetched successfully",
+      data: categories.map((c) => c.name),
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
+
+
+
+
+
+
 module.exports = {
   addproductControllers,
   getallproductControllers,
@@ -562,5 +619,6 @@ module.exports = {
   getCategoryPanjabiControllers ,
   getCategoryCargoDenimsControllers,
   accessoriesproductsControllers,
-  getpremiumsockesControllers
+  getpremiumsockesControllers,
+  getallmencategoryControllers,
 };

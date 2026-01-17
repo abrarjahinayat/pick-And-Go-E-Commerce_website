@@ -43,46 +43,45 @@ const Category = () => {
   }
 
   return (
-    <section className="py-16 bg-gradient-to-b from-white to-gray-50">
+    <section className="lg:py-16 py-6 bg-gradient-to-b from-white to-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900 mb-3">
+        <div className="text-center mb-3 lg:mb-12">
+          <h2 className="lg:text-4xl text-3xl font-bold text-gray-900 mb-3">
             Shop by Category
           </h2>
-          <p className="text-gray-600 text-lg">
+          <p className="text-gray-600 text-base lg:text-lg">
             Discover our wide range of products
           </p>
         </div>
 
-        {/* Category Grid */}
-        <div className="flex flex-wrap gap-8 justify-center pt-8">
+        {/* Category Grid - Responsive: 2 cols on mobile, flex-wrap on larger screens */}
+        <div className="grid grid-cols-2 gap-6 sm:gap-6 md:flex md:flex-wrap md:gap-8 md:justify-center pt-8">
           {categories.map((category, index) => (
             <Link 
               href={`/category/${category.slug}`} 
               key={category?._id || index}
-              className="group"
+              className="group flex justify-center"
             >
-              <div className="relative ">
+              <div className="relative">
                 {/* Category Image */}
-                <div className="relative h-48 w-48 overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-300">
+                <div className="relative h-38 w-38 sm:h-40 sm:w-40 md:h-48 md:w-48 overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-300">
                   {category?.image ? (
                     <img
                       src={category.image}
                       alt={category?.name || 'Category'}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-300"
+                      className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
-                      <span className="text-4xl">🛍️</span>
+                      <span className="text-2xl sm:text-3xl md:text-4xl">🛍️</span>
                     </div>
                   )}
                 </div>
 
                 {/* Category Name - Outside and Above Image */}
-                <div className="absolute  -top-4 left-1/2 transform -translate-x-1/2 bg-white px-4 py-2 rounded-full shadow-md border border-gray-200">
-                  <h3 className="font-semibold text-gray-900 text-[12px] whitespace-nowrap group-hover:text-blue-600 transition-colors duration-300">
+                <div className="absolute -top-3 sm:-top-4 left-1/2 transform -translate-x-1/2 bg-white px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 rounded-full shadow-md border border-gray-200">
+                  <h3 className="font-semibold text-gray-900 text-[10px] sm:text-[11px] md:text-[12px] whitespace-nowrap group-hover:text-blue-600 transition-colors duration-300">
                     {category?.name || 'Category'}
                   </h3>
                 </div>

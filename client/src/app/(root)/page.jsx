@@ -28,7 +28,7 @@ const page = () => {
         <Comfort/>
         <PoloSection/>
         <KurtiTopsSection/>
-        <FeatureImage2/>
+        {/* <FeatureImage2/>
         <PanjabiSection/>
         <FeatureImage3/>
         <CargoDenimSection/>
@@ -37,7 +37,7 @@ const page = () => {
         <PremiumSocksSection/>
         <KidsFeatureImg/>
         <WomenProductSection/>
-        <Footer/>
+        <Footer/> */}
     </div>
   )
 }
