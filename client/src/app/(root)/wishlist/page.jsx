@@ -115,7 +115,7 @@ const Page = () => {
   }
 
   return (
-    <section className="py-12 bg-gray-50 min-h-screen">
+    <section className="py-12 px-2 lg:px-0 bg-gray-50 min-h-screen">
       <Container>
         {/* Notification Toast */}
         {notification.show && (
@@ -135,10 +135,10 @@ const Page = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl lg:text-4xl font-bold text-gray-900 mb-2">
               My Wishlist
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-600 text-sm">
               {wishlistItems.length} {wishlistItems.length === 1 ? 'item' : 'items'} saved
             </p>
           </div>
@@ -170,7 +170,7 @@ const Page = () => {
               <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-pink-100 to-red-100 rounded-full flex items-center justify-center">
                 <HeartOff className="w-12 h-12 text-red-400" />
               </div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              <h2 className="lg:text-3xl text-xl font-bold text-gray-900 mb-4">
                 Your Wishlist is Empty
               </h2>
               <p className="text-gray-600 mb-8">

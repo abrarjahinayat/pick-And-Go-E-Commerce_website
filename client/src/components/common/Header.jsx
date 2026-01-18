@@ -388,7 +388,7 @@ const Header = () => {
             {/* Close Button */}
             <button
               onClick={() => setShowMobileMenu(false)}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 transition-colors"
+              className="absolute top-4 right-10 text-gray-600 hover:text-gray-900 transition-colors"
             >
               <X className="w-6 h-6" />
             </button>

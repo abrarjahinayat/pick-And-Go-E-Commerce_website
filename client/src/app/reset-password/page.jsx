@@ -1,12 +1,13 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useState, Suspense } from 'react'
 import Container from '@/components/common/Container'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import axios from 'axios'
 import { Lock, Eye, EyeOff, CheckCircle, AlertCircle, Loader, KeyRound } from 'lucide-react'
 
-const Page = () => {
+// Separate component that uses useSearchParams
+function ResetPasswordForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const email = searchParams.get('email') || ''
@@ -381,6 +382,22 @@ const Page = () => {
         }
       `}</style>
     </div>
+  )
+}
+
+// Main page component with Suspense wrapper
+const Page = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <ResetPasswordForm />
+    </Suspense>
   )
 }
 

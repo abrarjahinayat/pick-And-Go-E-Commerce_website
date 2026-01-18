@@ -1,88 +1,60 @@
 require('dotenv').config();
 const express = require('express');
-const dbconnetcion = require('./src/config/dbconfig');
+const dbconnection = require('./src/config/dbconfig');
 const router = require('./src/route');
 const errorHandlingMiddleware = require('./src/utils/errorhandling');
 const pathNotFoundMiddleware = require('./src/utils/pathnotefound');
-const cors = require('cors')
-const app = express()
+const cors = require('cors');
+
+const app = express();
 const httpserver = require('http').createServer(app);
-const {Server} = require('socket.io');
-const port = process.env.PORT || 3000;
-const cartModel = require('./src/model/cart.model');
-// const session = require('express-session')
 
-app.use(cors())
-// database connection
- dbconnetcion();
+// Use PORT from Render environment
+const port = process.env.PORT || 4000;
 
-// middleware
-app.use(express.json())
+// CORS - Allow your frontend domain
+app.use(cors({
+    origin: [
+        'https://trendygo.top',
+        'https://www.trendygo.top',
+        'http://localhost:3000'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
-// static folder middleware
+// Database connection
+dbconnection()
+    .then(() => console.log('✅ Database connected'))
+    .catch(err => console.error('❌ Database error:', err.message));
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static("uploads"));
 
+// Health check
+app.get('/health', (req, res) => {
+    const mongoose = require('mongoose');
+    res.json({
+        status: 'OK',
+        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+        timestamp: new Date()
+    });
+});
 
-// const io = new Server(httpserver, {
-//     cors: {
-//         origin: "*",
-//     }
-// });
+// Routes
+app.use(router);
 
-// io.on("connection", (socket) => {
-
-//     socket.on("addToCart", (data) => {
-//         console.log("data received in socket server:", data);
-        
-//         let addcart = new cartModel(data);
-//         addcart.save();
-        
-//         socket.emit("addToCart", addcart);
-
-//         socket.on("update-cart", (updatedCart) => {
-//             console.log("data received in socket server:", updatedCart);
-//             socket.emit("update-cart", updatedCart);
-//         });
-
-//     });
-
-
-
-
-//     console.log(`User connected: ${socket.id}`);
-
-//     socket.on("disconnect", () => {
-//         console.log(`User disconnected: ${socket.id}`);
-//     });
-// });
-
-
-// Express Session Middleware
-// app.use(session({
-//   secret: process.env.SECRET_KEY,
-//   resave: false,
-//   saveUninitialized: true,
-//   cookie: { secure: false }
-// }))
-
-// router middleware
-app.use(router)
-
-
-
-
-//  app.get('/', (req, res, next) => {
-//   console.log(req.session.userinfo);
-//   res.send("session text");
-// });
-
-// page not found
-app.use(pathNotFoundMiddleware)
-
-// error handling middleware
+// Error handling
+app.use(pathNotFoundMiddleware);
 app.use(errorHandlingMiddleware);
 
-httpserver.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-   
+// Start server
+httpserver.listen(port, '0.0.0.0', () => {
+    console.log(`✅ Server running on port ${port}`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 });
+
+module.exports = app;
