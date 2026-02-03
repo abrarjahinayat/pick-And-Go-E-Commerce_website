@@ -1,10 +1,19 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { useSelector } from "react-redux";
-import { usePathname } from "next/navigation";
-import { ShoppingCart, Search, User, Heart, Menu, LogOut, X } from "lucide-react";
+import { useSelector, useDispatch } from "react-redux";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  ShoppingCart,
+  Search,
+  User,
+  Heart,
+  Menu,
+  LogOut,
+  X,
+} from "lucide-react";
 import axios from "axios";
+import { userinfo } from "../../slices/userSlice";
 
 const Header = () => {
   const [showAccountMenu, setShowAccountMenu] = useState(false);
@@ -21,11 +30,29 @@ const Header = () => {
 
   const user = useSelector((state) => state.user.value);
   const pathname = usePathname();
+  const dispatch = useDispatch();
+  const router = useRouter();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    dispatch(userinfo(null));
     setShowMobileMenu(false);
+    window.location.href = "/login";
   };
+
+  // ✅ REHYDRATE USER FROM LOCALSTORAGE ON PAGE LOAD
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser && !user) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        dispatch(userinfo(parsedUser));
+      } catch (error) {
+        console.error("Failed to parse user from localStorage", error);
+      }
+    }
+  }, [dispatch, user]);
 
   // ---------------- CART ----------------
   useEffect(() => {
@@ -41,7 +68,7 @@ const Header = () => {
     if (!user?._id) return;
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_API}/wishlist/getsinglewishlist/${user?._id}`
+        `${process.env.NEXT_PUBLIC_API}/wishlist/getsinglewishlist/${user?._id}`,
       )
       .then((res) => setWishlistData(res?.data?.data))
       .catch(() => {});
@@ -64,7 +91,7 @@ const Header = () => {
 
     const filtered = allProducts
       .filter((item) =>
-        item?.title?.toLowerCase().includes(searchText.toLowerCase())
+        item?.title?.toLowerCase().includes(searchText.toLowerCase()),
       )
       .slice(0, 6);
 
@@ -109,7 +136,10 @@ const Header = () => {
               • Spend ৳1000 & get ৳100 off with Coupon: <strong>AJA50</strong>
             </p>
             <div className="hidden sm:flex items-center gap-4 ml-auto">
-              <Link href="/track-order" className="hover:underline whitespace-nowrap">
+              <Link
+                href="/track-order"
+                className="hover:underline whitespace-nowrap"
+              >
                 Track Order
               </Link>
               <Link href="/help" className="hover:underline">
@@ -280,10 +310,10 @@ const Header = () => {
       {/* Mobile Search Dropdown with Animation */}
       <div
         className={`md:hidden border-t border-gray-200 bg-white transition-all duration-300 ease-in-out ${
-          showMobileSearch ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'
-        } overflow-visible`}
+          showMobileSearch ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+        } overflow-hidden`}
       >
-        <div className="px-4 py-4 relative">
+        <div className="px-4 py-4">
           <div className="relative">
             <input
               type="text"
@@ -294,36 +324,49 @@ const Header = () => {
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           </div>
+
+          {/* Search Suggestions - Mobile (Inside the same container) */}
+          {suggestions.length > 0 && (
+            <div className="mt-3 bg-white rounded-xl shadow-lg border border-gray-200 max-h-60 overflow-y-auto">
+              {suggestions.map((product) => (
+                <div
+                  key={product._id}
+                  onTouchStart={(e) => {
+                    e.stopPropagation();
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const slug = product.slug;
+                    setSearchText("");
+                    setSuggestions([]);
+                    setShowMobileSearch(false);
+                    // Use setTimeout to ensure state updates before navigation
+                    setTimeout(() => {
+                      router.push(`/allproducts/${slug}`);
+                    }, 100);
+                  }}
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 active:bg-blue-50 cursor-pointer"
+                >
+                  <img
+                    src={product.image[0]}
+                    alt={product.title}
+                    className="w-12 h-12 object-contain flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium line-clamp-1">
+                      {product.title}
+                    </p>
+                    <p className="text-sm text-red-600 font-semibold">
+                      ৳{product.price}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Search Suggestions - Mobile (Outside the collapsible container) */}
-      {showMobileSearch && suggestions.length > 0 && (
-        <div className="md:hidden fixed left-0 right-0 mx-4 mt-2 bg-white rounded-xl shadow-2xl border border-gray-200 z-[9999] max-h-60 overflow-y-auto">
-          {suggestions.map((product) => (
-            <Link
-              key={product._id}
-              href={`/allproducts/${product.slug}`}
-              onClick={handleSuggestionClick}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
-            >
-              <img
-                src={product.image[0]}
-                alt={product.title}
-                className="w-12 h-12 object-contain flex-shrink-0"
-              />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium line-clamp-1">
-                  {product.title}
-                </p>
-                <p className="text-sm text-red-600 font-semibold">
-                  ৳{product.price}
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
 
       {/* Desktop Navigation Menu */}
       <nav className="border-t border-gray-200">
@@ -344,8 +387,8 @@ const Header = () => {
                           ? "text-red-700"
                           : "text-red-600 group-hover:text-red-700"
                         : isActive
-                        ? "text-blue-600"
-                        : "text-gray-700 group-hover:text-blue-600"
+                          ? "text-blue-600"
+                          : "text-gray-700 group-hover:text-blue-600"
                     }`}
                   >
                     {item.label}
@@ -373,7 +416,9 @@ const Header = () => {
         {/* Backdrop with Blur Effect - visible when menu is open */}
         <div
           className={`fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300 ${
-            showMobileMenu ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+            showMobileMenu
+              ? "opacity-100 pointer-events-auto"
+              : "opacity-0 pointer-events-none"
           }`}
           onClick={() => setShowMobileMenu(false)}
         ></div>
@@ -381,7 +426,7 @@ const Header = () => {
         {/* Sidebar with Slide Animation */}
         <div
           className={`fixed top-0 right-0 h-full w-72 bg-white shadow-2xl z-50 md:hidden overflow-y-auto transform transition-transform duration-300 ease-in-out ${
-            showMobileMenu ? 'translate-x-0' : 'translate-x-full'
+            showMobileMenu ? "translate-x-0" : "translate-x-full"
           }`}
         >
           <div className="p-4">

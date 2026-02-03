@@ -63,17 +63,18 @@ const handleSubmit = async (e) => {
   try {
     const res = await axios.post(`${process.env.NEXT_PUBLIC_API}/auth/login`, formData)
 
-    // ❌ Show toast if login failed
     if (!res.data.success) {
       toast.error(res.data.message || "Invalid email or password")
       setLoading(false)
       return
     }
 
-    // ✔ Success toast
     toast.success("Login successful! Redirecting...")
 
+    // ✅ Store BOTH token and user data
     localStorage.setItem("token", JSON.stringify(res.data.token))
+    localStorage.setItem("user", JSON.stringify(res.data.data))  // ← ADD THIS
+    
     dispatch(userinfo(res.data.data))
     router.push("/")
 
@@ -84,7 +85,6 @@ const handleSubmit = async (e) => {
     setLoading(false)
   }
 }
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
