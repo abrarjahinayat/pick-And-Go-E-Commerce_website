@@ -202,7 +202,7 @@ const AddProduct = () => {
       formDataToSend.append("category", formData.category);
       formDataToSend.append("stock", formData.stock);
       formDataToSend.append("productType", formData.productType);
-     
+      formDataToSend.append("variantType", formData.variantType); // ✅ FIXED: Added variantType
       
       // Optional fields
       formDataToSend.append("price", formData.price || "0");
@@ -215,10 +215,6 @@ const AddProduct = () => {
       if (formData.subcategory) {
         formDataToSend.append("subcategory", formData.subcategory);
       }
-
-      // Arrays - send as empty arrays initially
-    
-      formDataToSend.append("variants", JSON.stringify([]));
 
       console.log("=== Sending Product Data ===");
       console.log("Title:", formData.title);

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, Layers, X, Upload, Image as ImageIcon } from "lucide-react";
+import { Plus, Edit, Trash2, Layers, X, Image as ImageIcon } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
 
@@ -24,8 +24,16 @@ const CategoriesManagement = () => {
 
   const fetchCategories = async () => {
     try {
+      const token = JSON.parse(localStorage.getItem("token"));
+      
+      // Use admin endpoint to get all categories (active + inactive)
       const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_API}/category/getallcategory`
+        `${process.env.NEXT_PUBLIC_API}/category/getallcategoryadmin`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setCategories(res?.data?.data || []);
       setLoading(false);
@@ -195,68 +203,74 @@ const CategoriesManagement = () => {
       </div>
 
       {/* Categories Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {categories.length > 0 ? (
           categories.map((category) => (
             <div
               key={category._id}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition group"
+              className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 group"
             >
               {/* Category Image */}
-              <div className="relative h-48 bg-gray-100">
+              <div className="relative h-56 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
                 <img
                   src={category.image}
                   alt={category.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-300"
+                  onError={(e) => {
+                    e.target.src = "https://via.placeholder.com/400x400?text=No+Image";
+                  }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                
+                {/* Overlay with gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 
                 {/* Action Buttons */}
-                <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
                   <button
                     onClick={() => handleEdit(category)}
-                    className="bg-white text-blue-600 p-2 rounded-lg hover:bg-blue-50 transition shadow-lg"
+                    className="bg-white text-blue-600 p-2.5 rounded-lg hover:bg-blue-600 hover:text-white transition-all shadow-lg"
                   >
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(category._id)}
-                    className="bg-white text-red-600 p-2 rounded-lg hover:bg-red-50 transition shadow-lg"
+                    className="bg-white text-red-600 p-2.5 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-lg"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
 
-                {/* Category Name Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <h3 className="text-xl font-bold text-white mb-1">
-                    {category.name}
-                  </h3>
-                  <p className="text-sm text-gray-200">{category.slug}</p>
+                {/* Status Badge */}
+                <div className="absolute top-3 left-3">
+                  <span
+                    className={`px-3 py-1 text-xs font-bold rounded-full shadow-lg ${
+                      category.isActive
+                        ? "bg-green-500 text-white"
+                        : "bg-red-500 text-white"
+                    }`}
+                  >
+                    {category.isActive ? "Active" : "Inactive"}
+                  </span>
                 </div>
               </div>
 
               {/* Category Info */}
               <div className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                        category.isActive
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
-                    >
-                      {category.isActive ? "Active" : "Inactive"}
+                <h3 className="text-lg font-bold text-gray-900 mb-1 truncate">
+                  {category.name}
+                </h3>
+                <p className="text-sm text-gray-500 mb-3 truncate">
+                  {category.slug}
+                </p>
+                
+                {category.subcategory && category.subcategory.length > 0 && (
+                  <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                    <Layers className="w-4 h-4 text-blue-600" />
+                    <span className="font-medium">
+                      {category.subcategory.length} subcategories
                     </span>
                   </div>
-                  {category.subcategory && category.subcategory.length > 0 && (
-                    <div className="flex items-center gap-1 text-sm text-gray-500">
-                      <Layers className="w-4 h-4" />
-                      <span>{category.subcategory.length} subcategories</span>
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
             </div>
           ))
@@ -320,7 +334,7 @@ const CategoriesManagement = () => {
                         <img
                           src={previewUrl}
                           alt="Preview"
-                          className="w-full h-48 object-cover rounded-lg"
+                          className="w-full h-48 object-contain rounded-lg bg-gray-50"
                         />
                         <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
                           <span className="text-white font-medium">

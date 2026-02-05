@@ -2,13 +2,17 @@
 import React, { useState, useEffect } from "react";
 import {
   Search,
-  Filter,
   Eye,
   Package,
   Truck,
   CheckCircle,
   XCircle,
   Clock,
+  Phone,
+  MapPin,
+  CreditCard,
+  User,
+  DollarSign,
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -19,6 +23,7 @@ const OrdersManagement = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [paymentFilter, setPaymentFilter] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
 
@@ -28,7 +33,7 @@ const OrdersManagement = () => {
 
   useEffect(() => {
     filterOrders();
-  }, [searchTerm, statusFilter, orders]);
+  }, [searchTerm, statusFilter, paymentFilter, orders]);
 
   const fetchOrders = async () => {
     try {
@@ -53,14 +58,20 @@ const OrdersManagement = () => {
       filtered = filtered.filter(
         (order) =>
           order._id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          order.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          order.email?.toLowerCase().includes(searchTerm.toLowerCase())
+          order.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          order.user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          order.phone?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Status filter
     if (statusFilter !== "all") {
-      filtered = filtered.filter((order) => order.status === statusFilter);
+      filtered = filtered.filter((order) => order.orderstatus === statusFilter);
+    }
+
+    // Payment filter
+    if (paymentFilter !== "all") {
+      filtered = filtered.filter((order) => order.paymentmethod === paymentFilter);
     }
 
     setFilteredOrders(filtered);
@@ -68,9 +79,9 @@ const OrdersManagement = () => {
 
   const handleStatusUpdate = async (orderId, newStatus) => {
     try {
-      const res = await axios.put(
-        `${process.env.NEXT_PUBLIC_API}/order/updateorder/${orderId}`,
-        { status: newStatus }
+      const res = await axios.patch(
+        `${process.env.NEXT_PUBLIC_API}/order/updatestatus/${orderId}`,
+        { orderstatus: newStatus }
       );
 
       if (res.data.success) {
@@ -87,14 +98,10 @@ const OrdersManagement = () => {
     switch (status) {
       case "pending":
         return <Clock className="w-4 h-4" />;
-      case "processing":
+      case "confirmed":
         return <Package className="w-4 h-4" />;
-      case "shipping":
-        return <Truck className="w-4 h-4" />;
       case "delivered":
         return <CheckCircle className="w-4 h-4" />;
-      case "cancelled":
-        return <XCircle className="w-4 h-4" />;
       default:
         return <Clock className="w-4 h-4" />;
     }
@@ -104,17 +111,19 @@ const OrdersManagement = () => {
     switch (status) {
       case "pending":
         return "bg-yellow-100 text-yellow-800";
-      case "processing":
+      case "confirmed":
         return "bg-blue-100 text-blue-800";
-      case "shipping":
-        return "bg-purple-100 text-purple-800";
       case "delivered":
         return "bg-green-100 text-green-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const getPaidStatusColor = (paid) => {
+    return paid === "paid"
+      ? "bg-green-100 text-green-800"
+      : "bg-orange-100 text-orange-800";
   };
 
   if (loading) {
@@ -129,9 +138,7 @@ const OrdersManagement = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-          Orders
-        </h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Orders</h1>
         <p className="text-gray-600 mt-1">
           Manage customer orders ({filteredOrders.length} orders)
         </p>
@@ -139,13 +146,13 @@ const OrdersManagement = () => {
 
       {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Search */}
-          <div className="flex-1 relative">
+          <div className="sm:col-span-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
-              placeholder="Search by order ID, name, or email..."
+              placeholder="Search orders..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -153,7 +160,7 @@ const OrdersManagement = () => {
           </div>
 
           {/* Status Filter */}
-          <div className="sm:w-48">
+          <div>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -161,10 +168,21 @@ const OrdersManagement = () => {
             >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
-              <option value="processing">Processing</option>
-              <option value="shipping">Shipping</option>
+              <option value="confirmed">Confirmed</option>
               <option value="delivered">Delivered</option>
-              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          {/* Payment Filter */}
+          <div>
+            <select
+              value={paymentFilter}
+              onChange={(e) => setPaymentFilter(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Payments</option>
+              <option value="cod">Cash on Delivery</option>
+              <option value="online">Online Payment</option>
             </select>
           </div>
         </div>
@@ -183,13 +201,19 @@ const OrdersManagement = () => {
                   Customer
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Total Amount
+                  Items
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Total
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Payment
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                  Paid Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Order Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date
@@ -209,40 +233,44 @@ const OrdersManagement = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm">
                         <p className="font-medium text-gray-900">
-                          {order.name}
+                          {order.user?.name || "N/A"}
                         </p>
-                        <p className="text-gray-500">{order.email}</p>
+                        <p className="text-gray-500">{order.user?.email || "N/A"}</p>
                       </div>
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {order.items?.length || 0} items
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                      ৳{order.totalAmount?.toLocaleString() || 0}
+                      ৳{order.totalprice?.toLocaleString() || 0}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                        {order.paymentmethod === "cod" ? "COD" : "Online"}
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          order.paymentMethod === "COD"
-                            ? "bg-orange-100 text-orange-800"
-                            : "bg-green-100 text-green-800"
-                        }`}
+                        className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getPaidStatusColor(
+                          order.paid
+                        )}`}
                       >
-                        {order.paymentMethod || "COD"}
+                        {order.paid === "paid" ? "Paid" : "Unpaid"}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <select
-                        value={order.status || "pending"}
+                        value={order.orderstatus || "pending"}
                         onChange={(e) =>
                           handleStatusUpdate(order._id, e.target.value)
                         }
                         className={`px-3 py-1 text-xs font-semibold rounded-full border-0 cursor-pointer ${getStatusColor(
-                          order.status
+                          order.orderstatus
                         )}`}
                       >
                         <option value="pending">Pending</option>
-                        <option value="processing">Processing</option>
-                        <option value="shipping">Shipping</option>
+                        <option value="confirmed">Confirmed</option>
                         <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancelled</option>
                       </select>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -256,7 +284,7 @@ const OrdersManagement = () => {
                         }}
                         className="text-blue-600 hover:text-blue-900 transition"
                       >
-                        <Eye className="w-4 h-4" />
+                        <Eye className="w-5 h-5" />
                       </button>
                     </td>
                   </tr>
@@ -264,16 +292,12 @@ const OrdersManagement = () => {
               ) : (
                 <tr>
                   <td
-                    colSpan="7"
+                    colSpan="9"
                     className="px-6 py-12 text-center text-gray-500"
                   >
                     <Package className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-lg font-semibold mb-1">
-                      No orders found
-                    </p>
-                    <p className="text-sm">
-                      Try adjusting your search or filter
-                    </p>
+                    <p className="text-lg font-semibold mb-1">No orders found</p>
+                    <p className="text-sm">Try adjusting your search or filter</p>
                   </td>
                 </tr>
               )}
@@ -285,12 +309,19 @@ const OrdersManagement = () => {
       {/* Order Detail Modal */}
       {showDetailModal && selectedOrder && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200 sticky top-0 bg-white">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Order Details
-                </h2>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    Order #{selectedOrder._id.slice(-8).toUpperCase()}
+                  </h2>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Placed on{" "}
+                    {new Date(selectedOrder.createdAt).toLocaleString()}
+                  </p>
+                </div>
                 <button
                   onClick={() => setShowDetailModal(false)}
                   className="text-gray-400 hover:text-gray-600 transition"
@@ -301,86 +332,144 @@ const OrdersManagement = () => {
             </div>
 
             <div className="p-6 space-y-6">
-              {/* Order Info */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">Order ID</p>
-                  <p className="font-semibold">
-                    #{selectedOrder._id.slice(-8).toUpperCase()}
+              {/* Order Status Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Package className="w-5 h-5 text-blue-600" />
+                    <p className="text-sm font-medium text-blue-600">
+                      Order Status
+                    </p>
+                  </div>
+                  <p className="text-lg font-bold text-gray-900 capitalize">
+                    {selectedOrder.orderstatus}
                   </p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Date</p>
-                  <p className="font-semibold">
-                    {new Date(selectedOrder.createdAt).toLocaleDateString()}
+
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <div className="flex items-center gap-2 mb-1">
+                    <CreditCard className="w-5 h-5 text-green-600" />
+                    <p className="text-sm font-medium text-green-600">Payment</p>
+                  </div>
+                  <p className="text-lg font-bold text-gray-900">
+                    {selectedOrder.paymentmethod === "cod" ? "COD" : "Online"}
+                  </p>
+                  <p className="text-xs text-gray-600 capitalize">
+                    {selectedOrder.paid}
                   </p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Payment Method</p>
-                  <p className="font-semibold">
-                    {selectedOrder.paymentMethod || "COD"}
+
+                <div className="bg-purple-50 p-4 rounded-lg">
+                  <div className="flex items-center gap-2 mb-1">
+                    <DollarSign className="w-5 h-5 text-purple-600" />
+                    <p className="text-sm font-medium text-purple-600">
+                      Total Amount
+                    </p>
+                  </div>
+                  <p className="text-lg font-bold text-gray-900">
+                    ৳{selectedOrder.totalprice?.toLocaleString()}
                   </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Status</p>
-                  <span
-                    className={`inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full ${getStatusColor(
-                      selectedOrder.status
-                    )}`}
-                  >
-                    {getStatusIcon(selectedOrder.status)}
-                    {selectedOrder.status}
-                  </span>
                 </div>
               </div>
 
-              {/* Customer Info */}
-              <div className="border-t pt-6">
-                <h3 className="text-lg font-semibold mb-4">
-                  Customer Information
-                </h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-500">Name</p>
-                    <p className="font-medium">{selectedOrder.name}</p>
+              {/* Customer & Delivery Info */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Customer Info */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <User className="w-5 h-5 text-blue-600" />
+                    Customer Information
+                  </h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm text-gray-500">Name</p>
+                      <p className="font-medium">
+                        {selectedOrder.user?.name || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Email</p>
+                      <p className="font-medium">
+                        {selectedOrder.user?.email || "N/A"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Phone</p>
+                      <p className="font-medium flex items-center gap-2">
+                        <Phone className="w-4 h-4 text-gray-400" />
+                        {selectedOrder.phone}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Email</p>
-                    <p className="font-medium">{selectedOrder.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Phone</p>
-                    <p className="font-medium">{selectedOrder.phone}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Address</p>
-                    <p className="font-medium">{selectedOrder.address}</p>
+                </div>
+
+                {/* Delivery Info */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <Truck className="w-5 h-5 text-blue-600" />
+                    Delivery Information
+                  </h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm text-gray-500">City</p>
+                      <p className="font-medium">{selectedOrder.city}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Address</p>
+                      <p className="font-medium flex items-start gap-2">
+                        <MapPin className="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" />
+                        {selectedOrder.address}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Delivery Charge</p>
+                      <p className="font-medium capitalize">
+                        {selectedOrder.deliverycharge === "insideDhaka"
+                          ? "Inside Dhaka"
+                          : "Outside Dhaka"}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Order Items */}
-              <div className="border-t pt-6">
+              <div>
                 <h3 className="text-lg font-semibold mb-4">Order Items</h3>
                 <div className="space-y-3">
                   {selectedOrder.items?.map((item, index) => (
                     <div
                       key={index}
-                      className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg"
+                      className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg"
                     >
                       <img
-                        src={item.image || "/placeholder.png"}
-                        alt={item.name}
-                        className="w-16 h-16 rounded-lg object-cover"
+                        src={
+                          item.product?.image?.[0] ||
+                          "https://via.placeholder.com/80?text=No+Image"
+                        }
+                        alt={item.product?.title || "Product"}
+                        className="w-20 h-20 rounded-lg object-cover border border-gray-200"
                       />
                       <div className="flex-1">
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-sm text-gray-500">
-                          Qty: {item.quantity} × ৳{item.price}
+                        <p className="font-medium text-gray-900">
+                          {item.product?.title || "N/A"}
+                        </p>
+                        {item.variants && (
+                          <p className="text-sm text-gray-500">
+                            Size: {item.variants.size || "N/A"} | Color:{" "}
+                            {item.variants.color || "N/A"}
+                          </p>
+                        )}
+                        <p className="text-sm text-gray-600 mt-1">
+                          Qty: {item.quantity} × ৳
+                          {item.product?.price?.toLocaleString() || 0}
                         </p>
                       </div>
-                      <p className="font-semibold">
-                        ৳{(item.quantity * item.price).toLocaleString()}
+                      <p className="font-semibold text-gray-900">
+                        ৳
+                        {(
+                          (item.quantity || 0) * (item.product?.price || 0)
+                        ).toLocaleString()}
                       </p>
                     </div>
                   ))}
@@ -389,33 +478,38 @@ const OrdersManagement = () => {
 
               {/* Order Summary */}
               <div className="border-t pt-6">
-                <div className="space-y-2">
+                <h3 className="text-lg font-semibold mb-4">Order Summary</h3>
+                <div className="space-y-3 max-w-md ml-auto">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Subtotal</span>
                     <span className="font-medium">
-                      ৳{selectedOrder.subtotal?.toLocaleString() || 0}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Shipping</span>
-                    <span className="font-medium">
-                      ৳{selectedOrder.shippingCost || 0}
+                      ৳{(selectedOrder.totalprice - (selectedOrder.discount || 0)).toLocaleString()}
                     </span>
                   </div>
                   {selectedOrder.discount > 0 && (
                     <div className="flex justify-between text-sm text-green-600">
                       <span>Discount</span>
-                      <span>-৳{selectedOrder.discount}</span>
+                      <span>-৳{selectedOrder.discount.toLocaleString()}</span>
                     </div>
                   )}
-                  <div className="flex justify-between text-lg font-bold pt-2 border-t">
+                  <div className="flex justify-between text-lg font-bold pt-3 border-t">
                     <span>Total</span>
-                    <span>
-                      ৳{selectedOrder.totalAmount?.toLocaleString() || 0}
+                    <span className="text-blue-600">
+                      ৳{selectedOrder.totalprice?.toLocaleString() || 0}
                     </span>
                   </div>
                 </div>
               </div>
+
+              {/* Transaction Info (if online payment) */}
+              {selectedOrder.transactionId && (
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 mb-1">Transaction ID</p>
+                  <p className="font-mono font-semibold text-gray-900">
+                    {selectedOrder.transactionId}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

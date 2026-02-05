@@ -1,7 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Package,
@@ -18,12 +18,48 @@ import {
   ChevronDown,
   FileImage,
   Grid3x3,
+  User,
+  ShieldCheck,
 } from "lucide-react";
+import { toast } from "sonner";
 
 const AdminLayout = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [adminInfo, setAdminInfo] = useState(null);
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Get admin info from localStorage
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      try {
+        const parsedUser = JSON.parse(user);
+        setAdminInfo(parsedUser);
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    }
+  }, []);
+
+  const handleLogout = () => {
+    // Clear localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    
+    // Show success message
+    toast.success("Logged out successfully");
+    
+    // Close modal
+    setShowLogoutModal(false);
+    
+    // Redirect to login page
+    setTimeout(() => {
+      router.push("/admin/login");
+    }, 500);
+  };
 
   const menuItems = [
     {
@@ -90,12 +126,12 @@ const AdminLayout = ({ children }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top Header */}
-      <header className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30">
+      <header className="bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30 shadow-sm">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition"
             >
               {sidebarOpen ? (
                 <X className="w-6 h-6" />
@@ -105,7 +141,7 @@ const AdminLayout = ({ children }) => {
             </button>
 
             <div className="flex items-center gap-2">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-xl px-3 py-1 rounded-lg">
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold text-xl px-3 py-1 rounded-lg shadow-md">
                 P&G
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hidden sm:inline">
@@ -114,15 +150,35 @@ const AdminLayout = ({ children }) => {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
+            {/* Admin Info */}
+            {adminInfo && (
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-lg border border-blue-100">
+                <ShieldCheck className="w-4 h-4 text-blue-600" />
+                <div className="text-xs">
+                  <p className="font-semibold text-gray-900">{adminInfo.name}</p>
+                  <p className="text-gray-500">{adminInfo.role}</p>
+                </div>
+              </div>
+            )}
+
+            {/* View Site Button */}
             <Link
               href="/"
               target="_blank"
-              className="text-sm text-gray-600 hover:text-blue-600 transition"
+              className="hidden sm:flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
             >
-              View Site
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+              <span>View Site</span>
             </Link>
-            <button className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition">
+
+            {/* Logout Button */}
+            <button
+              onClick={() => setShowLogoutModal(true)}
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition"
+            >
               <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline">Logout</span>
             </button>
@@ -132,11 +188,28 @@ const AdminLayout = ({ children }) => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-[57px] left-0 bottom-0 w-64 bg-white border-r border-gray-200 z-20 transition-transform duration-300 ${
+        className={`fixed top-[57px] left-0 bottom-0 w-64 bg-white border-r border-gray-200 z-20 transition-transform duration-300 overflow-hidden ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0`}
       >
         <div className="h-full overflow-y-auto py-6">
+          {/* Admin Profile in Sidebar (Mobile) */}
+          {adminInfo && (
+            <div className="lg:hidden px-3 mb-6">
+              <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                  {adminInfo.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 truncate">
+                    {adminInfo.name}
+                  </p>
+                  <p className="text-xs text-gray-500">{adminInfo.email}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <nav className="space-y-1 px-3">
             {menuItems.map((item) => {
               if (item.submenu) {
@@ -212,6 +285,39 @@ const AdminLayout = ({ children }) => {
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-10 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         ></div>
+      )}
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+            <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
+              <LogOut className="w-6 h-6 text-red-600" />
+            </div>
+            
+            <h3 className="text-xl font-bold text-gray-900 text-center mb-2">
+              Confirm Logout
+            </h3>
+            <p className="text-gray-600 text-center mb-6">
+              Are you sure you want to logout from the admin panel?
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
+              >
+                Yes, Logout
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Main Content */}

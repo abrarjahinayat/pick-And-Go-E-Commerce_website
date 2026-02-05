@@ -13,8 +13,11 @@ import {
   Home,
   ArrowLeft,
   ShoppingBag,
+  Tag,
+  X,
+  CheckCircle,
 } from "lucide-react";
-import { toast } from "sonner"
+import { toast } from "sonner";
 
 const Page = () => {
   const router = useRouter();
@@ -28,6 +31,8 @@ const Page = () => {
   const [shippingcharge, setShippingcharge] = useState(0);
   const [coupon, setcoupon] = useState("");
   const [applycopun, setapplycopun] = useState(0);
+  const [appliedCouponData, setAppliedCouponData] = useState(null);
+  const [couponLoading, setCouponLoading] = useState(false);
 
   const [shippingInfo, setShippingInfo] = useState({
     user: userId?._id,
@@ -39,7 +44,7 @@ const Page = () => {
     state: "",
     zipCode: "",
     country: "Bangladesh",
-    paymentMethod: "cod", // 👈 NEW: cod | online
+    paymentMethod: "cod",
   });
 
   const [errors, setErrors] = useState({});
@@ -101,8 +106,6 @@ const Page = () => {
       });
   }, []);
 
-
-
   // Fetch divisions
   useEffect(() => {
     axios
@@ -115,18 +118,73 @@ const Page = () => {
       });
   }, []);
 
-  const handlecoupon = () => {
-    axios.post(`${process.env.NEXT_PUBLIC_API}/coupon/applyCoupons`, {
-     code: coupon,
-    }).then((res) => {
-      if(res.data.data.minPrice <= subtotal ){
-        setapplycopun(res.data.data.amout);
-      } else {
-        toast.info(`Minimum purchase amount for this coupon is ৳${res.data.data.minPrice}`);
+  const handlecoupon = async () => {
+    if (!coupon.trim()) {
+      toast.error("Please enter a coupon code");
+      return;
+    }
+
+    setCouponLoading(true);
+
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API}/coupon/applyCoupons`,
+        {
+          code: coupon.toUpperCase(),
+          orderAmount: subtotal,
+        }
+      );
+
+      const couponData = res.data.data;
+      const minPurchase = Number(couponData.coupon?.minPrice || 0);
+      const discount = Number(
+        couponData.discountAmount || couponData.coupon?.amout || 0
+      );
+
+      // Check if minimum purchase requirement is met
+      if (subtotal < minPurchase) {
+        toast.error(
+          `Minimum purchase amount of ৳${minPurchase} required. You need ৳${(
+            minPurchase - subtotal
+          ).toFixed(2)} more.`
+        );
+        setCouponLoading(false);
+        return;
       }
-    }).catch((err) => {
-      toast.error("Invalid Promo Code");
-    });
+
+      // Apply the coupon
+      setapplycopun(discount);
+      setAppliedCouponData(couponData.coupon);
+      toast.success(`Coupon "${coupon}" applied! You saved ৳${discount}`);
+    } catch (err) {
+      console.error("Coupon error:", err);
+      
+      // Only show ONE toast - don't duplicate
+      let errorMessage = "Invalid or expired coupon code";
+      
+      // Check if backend sent a specific message
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      // Show error toast ONCE
+      toast.error(errorMessage);
+      
+      // Reset coupon state
+      setapplycopun(0);
+      setAppliedCouponData(null);
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setapplycopun(0);
+    setAppliedCouponData(null);
+    setcoupon("");
+    toast.info("Coupon removed");
   };
 
   const subtotal = cartItems.reduce(
@@ -134,23 +192,20 @@ const Page = () => {
     0
   );
   const shipping = shippingcharge ?? 0;
-  const total = (subtotal + shipping) - applycopun;
+  const total = subtotal + shipping - applycopun;
 
   const handleShippingChange = (e) => {
     const { name, value } = e.target;
 
-    // update form state
     setShippingInfo((prev) => ({
       ...prev,
       [name]: value,
     }));
 
-    // clear error for this field
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
 
-    // update shipping charge based on city
     if (name === "city") {
       if (!value) {
         setShippingcharge(0);
@@ -186,61 +241,41 @@ const Page = () => {
   };
 
   const handleProceedToPayment = async () => {
-    const {
-      user,
-      fullName,
-      email,
-      phone,
-      address,
-      city,
-      state,
-      zipCode,
-      paymentMethod, // 👈 payment method available here
-    } = shippingInfo;
+    if (!validateShipping()) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
 
-    // console.log(
-    //   fullName,
-    //   email,
-    //   phone,
-    //   address,
-    //   city,
-    //   state,
-    //   zipCode,
-    //   paymentMethod
-    // );
+    const { paymentMethod } = shippingInfo;
 
-    await axios
-      .post(`${process.env.NEXT_PUBLIC_API}/order/createorder`, {
-        user: userId?._id,
-        phone,
-        address,
-        city,
-        paymentmethod: paymentMethod,
-        totalprice: total,
-      })
-      .then((res) => {
-        if (res.data.method === "cod") {
-          router.push("/order-success");
-        } else {
-          window.location.href = res.data.paymenturl;
+    setProcessing(true);
+
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API}/order/createorder`,
+        {
+          user: userId?._id,
+          phone: shippingInfo.phone,
+          address: shippingInfo.address,
+          city: shippingInfo.city,
+          paymentmethod: paymentMethod,
+          totalprice: total,
+          couponCode: appliedCouponData?.code || null,
+          discountAmount: applycopun || 0,
         }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      );
 
-    // if (!validateShipping()) return;
-
-    // setProcessing(true);
-    // try {
-    //   localStorage.setItem("shippingInfo", JSON.stringify(shippingInfo));
-    //   router.push("/payment");
-    // } catch (error) {
-    //   console.error("Error:", error);
-    //   alert("Something went wrong");
-    // } finally {
-    //   setProcessing(false);
-    // }
+      if (res.data.method === "cod") {
+        router.push("/order-success");
+      } else {
+        window.location.href = res.data.paymenturl;
+      }
+    } catch (err) {
+      console.error("Order error:", err);
+      toast.error("Failed to create order. Please try again.");
+    } finally {
+      setProcessing(false);
+    }
   };
 
   if (loading) {
@@ -248,7 +283,8 @@ const Page = () => {
       <section className="py-16 bg-gray-50 min-h-screen">
         <Container>
           <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
-            <h2 className="text-3xl font-bold text-gray-900">Loading...</h2>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <h2 className="text-2xl font-bold text-gray-900">Loading...</h2>
           </div>
         </Container>
       </section>
@@ -408,8 +444,8 @@ const Page = () => {
                   )}
                 </div>
 
-                {/* City, State, ZIP */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {/* City, State */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* City */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -419,13 +455,14 @@ const Page = () => {
                       name="city"
                       value={shippingInfo.city}
                       onChange={handleShippingChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className={`w-full px-4 py-3 border ${
+                        errors.city ? "border-red-500" : "border-gray-300"
+                      } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
                     >
                       <option value="">Select a city</option>
                       {city.map((item) => (
                         <option key={item.disctrict} value={item.disctrict}>
                           {item.name}
-                          
                         </option>
                       ))}
                     </select>
@@ -445,7 +482,7 @@ const Page = () => {
                       onChange={handleShippingChange}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      <option  value="">Select a division</option>
+                      <option value="">Select a division</option>
                       {divisions.map((item) => (
                         <option key={item.division} value={item.division}>
                           {item.name}
@@ -453,48 +490,36 @@ const Page = () => {
                       ))}
                     </select>
                   </div>
-
-                  {/* ZIP Code
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      ZIP Code
-                    </label>
-                    <input
-                      type="text"
-                      name="zipCode"
-                      value={shippingInfo.zipCode}
-                      onChange={handleShippingChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="1000"
-                    />
-                  </div> */}
                 </div>
 
                 {/* Payment Method */}
-                <div className="mt-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">
+                <div className="mt-6 bg-gray-50 p-4 rounded-lg">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5 text-blue-600" />
                     Payment Method
                   </h3>
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <label className="flex items-center gap-2 border rounded-lg px-4 py-2 cursor-pointer">
+                    <label className="flex-1 flex items-center gap-3 border-2 rounded-lg px-4 py-3 cursor-pointer transition hover:border-blue-500 bg-white">
                       <input
                         type="radio"
                         name="paymentMethod"
                         value="cod"
                         checked={shippingInfo.paymentMethod === "cod"}
                         onChange={handleShippingChange}
+                        className="w-4 h-4 text-blue-600"
                       />
-                      <span>Cash on Delivery (COD)</span>
+                      <span className="font-medium">Cash on Delivery (COD)</span>
                     </label>
-                    <label className="flex items-center gap-2 border rounded-lg px-4 py-2 cursor-pointer">
+                    <label className="flex-1 flex items-center gap-3 border-2 rounded-lg px-4 py-3 cursor-pointer transition hover:border-blue-500 bg-white">
                       <input
                         type="radio"
                         name="paymentMethod"
                         value="online"
                         checked={shippingInfo.paymentMethod === "online"}
                         onChange={handleShippingChange}
+                        className="w-4 h-4 text-blue-600"
                       />
-                      <span>Online Payment</span>
+                      <span className="font-medium">Online Payment</span>
                     </label>
                   </div>
                 </div>
@@ -503,9 +528,16 @@ const Page = () => {
                 <button
                   onClick={handleProceedToPayment}
                   disabled={processing}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none mt-6"
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none mt-6 shadow-lg"
                 >
-                  {processing ? "Processing..." : "Proceed to Payment"}
+                  {processing ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      Processing...
+                    </span>
+                  ) : (
+                    "Proceed to Payment"
+                  )}
                 </button>
               </div>
             </div>
@@ -551,8 +583,66 @@ const Page = () => {
                 ))}
               </div>
 
+              {/* Promo Code */}
+              <div className="mb-6 border-b border-gray-200 pb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <Tag className="w-4 h-4" />
+                  Promo Code
+                </label>
+
+                {appliedCouponData ? (
+                  <div className="bg-green-50 border-2 border-green-500 rounded-lg p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <div>
+                        <p className="text-sm font-bold text-green-700">
+                          {appliedCouponData.code}
+                        </p>
+                        <p className="text-xs text-green-600">
+                          You saved ৳{applycopun.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={removeCoupon}
+                      className="text-red-500 hover:text-red-700 transition"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={coupon}
+                      onChange={(e) => setcoupon(e.target.value.toUpperCase())}
+                      onKeyPress={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handlecoupon();
+                        }
+                      }}
+                      placeholder="Enter code"
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase"
+                      disabled={couponLoading}
+                    />
+                    <button
+                      onClick={handlecoupon}
+                      disabled={couponLoading || !coupon.trim()}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {couponLoading ? (
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      ) : (
+                        "Apply"
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+
               {/* Price Breakdown */}
-              <div className="space-y-3 mb-4 pb-6 border-t border-b border-gray-200 pt-4">
+              <div className="space-y-3 mb-4 pb-6 border-b border-gray-200">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
                   <span className="font-medium">৳{subtotal.toFixed(2)}</span>
@@ -563,36 +653,32 @@ const Page = () => {
                     {shipping === 0 ? "Free" : `৳${shipping.toFixed(2)}`}
                   </span>
                 </div>
-              </div>
-              {/* Promo Code */}
-              <div className="mb-6 border-b border-gray-200 pb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Promo Code
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    onChange={(e) => setcoupon(e.target.value)}
-                    placeholder="Enter code"
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
-                  />
-
-                  <button
-                    onClick={handlecoupon}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Apply
-                  </button>
-                </div>
+                {applycopun > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span className="flex items-center gap-1">
+                      <Tag className="w-4 h-4" />
+                      Discount
+                    </span>
+                    <span className="font-medium">
+                      -৳{applycopun.toFixed(2)}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Total */}
               <div className="flex justify-between items-center">
                 <span className="text-xl font-bold text-gray-900">Total</span>
-                <span className="lg:text-3xl text-2xl font-bold text-gray-900">
+                <span className="lg:text-3xl text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   ৳{total.toFixed(2)}
                 </span>
               </div>
+
+              {applycopun > 0 && (
+                <p className="text-xs text-green-600 text-center mt-2">
+                  🎉 You saved ৳{applycopun.toFixed(2)} with this coupon!
+                </p>
+              )}
             </div>
           </div>
         </div>
